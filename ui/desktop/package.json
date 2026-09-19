@@ -1,7 +1,7 @@
 {
   "name": "goose-app",
   "productName": "Houshiar Code",
-  "version": "1.51.0",
+  "version": "1.51.1",
   "description": "Houshiar Code App",
   "engines": {
     "node": "^24.10.0",
