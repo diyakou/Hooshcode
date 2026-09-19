@@ -69,7 +69,10 @@ pub fn get_active_provider(config: &Config) -> Option<String> {
     if let Ok(val) = config.get_param::<String>(ACTIVE_PROVIDER_KEY) {
         return Some(val);
     }
-    config.get_param::<String>("GOOSE_PROVIDER").ok()
+    if let Ok(val) = config.get_param::<String>("GOOSE_PROVIDER") {
+        return Some(val);
+    }
+    Some("houshiar".to_string())
 }
 
 pub fn get_active_model(config: &Config) -> Option<String> {
@@ -83,7 +86,10 @@ pub fn get_active_model(config: &Config) -> Option<String> {
             }
         }
     }
-    config.get_param::<String>("GOOSE_MODEL").ok()
+    config
+        .get_param::<String>("GOOSE_MODEL")
+        .ok()
+        .or_else(|| Some("claude-sonnet-5".to_string()))
 }
 
 pub fn set_active_provider(config: &Config, name: &str, model: &str) -> Result<(), ConfigError> {

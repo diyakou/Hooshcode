@@ -929,10 +929,6 @@
   "dirSwitcher.enterPathInvalid": {
     "defaultMessage": "Working directory must be an absolute path"
   },
-
-
-
-
   "dirSwitcher.failedToUpdateWorkingDir": {
     "defaultMessage": "Impossibile aggiornare la cartella di lavoro"
   },
@@ -2172,9 +2168,6 @@
   "modelAndProviderContext.unknownProviderTitle": {
     "defaultMessage": "Ricerca nome provider"
   },
-  "modelSettingsButtons.configureProviders": {
-    "defaultMessage": "Configura provider"
-  },
   "modelSettingsButtons.switchModels": {
     "defaultMessage": "Cambia modelli"
   },
@@ -2426,12 +2419,6 @@
   },
   "onboardingGuard.retry": {
     "defaultMessage": "Riprova"
-  },
-  "onboardingGuard.welcomeDescription": {
-    "defaultMessage": "Il tuo agente IA locale. Collega un provider di modelli IA per iniziare."
-  },
-  "onboardingGuard.welcomeTitle": {
-    "defaultMessage": "Benvenuto in goose"
   },
   "onboardingSuccess.allSet": {
     "defaultMessage": "Tutto è pronto per iniziare a usare goose."
@@ -4772,5 +4759,8 @@
   },
   "settings.agentLoop.title": {
     "defaultMessage": "Ciclo agente"
+  },
+  "settings.language.persian": {
+    "defaultMessage": "Persian (فارسی)"
   }
 }

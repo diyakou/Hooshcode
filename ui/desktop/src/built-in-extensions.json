@@ -12,7 +12,7 @@
     "id": "computercontroller",
     "name": "Computer Controller",
     "description": "General computer control tools that don't require you to be a developer or engineer.",
-    "enabled": false,
+    "enabled": true,
     "type": "builtin",
     "env_keys": [],
     "timeout": 300

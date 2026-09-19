@@ -929,10 +929,6 @@
   "dirSwitcher.enterPathInvalid": {
     "defaultMessage": "Working directory must be an absolute path"
   },
-
-
-
-
   "dirSwitcher.failedToUpdateWorkingDir": {
     "defaultMessage": "更新工作目录失败"
   },
@@ -2172,9 +2168,6 @@
   "modelAndProviderContext.unknownProviderTitle": {
     "defaultMessage": "提供商名称查找"
   },
-  "modelSettingsButtons.configureProviders": {
-    "defaultMessage": "配置提供商"
-  },
   "modelSettingsButtons.switchModels": {
     "defaultMessage": "切换模型"
   },
@@ -2426,12 +2419,6 @@
   },
   "onboardingGuard.retry": {
     "defaultMessage": "重试"
-  },
-  "onboardingGuard.welcomeDescription": {
-    "defaultMessage": "你的本地 AI agent。连接 AI 模型提供商即可开始。"
-  },
-  "onboardingGuard.welcomeTitle": {
-    "defaultMessage": "欢迎使用 goose"
   },
   "onboardingSuccess.allSet": {
     "defaultMessage": "一切就绪，可以开始使用 goose 了。"
@@ -4772,5 +4759,8 @@
   },
   "settings.agentLoop.title": {
     "defaultMessage": "代理循环"
+  },
+  "settings.language.persian": {
+    "defaultMessage": "Persian (فارسی)"
   }
 }

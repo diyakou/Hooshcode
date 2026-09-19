@@ -31,7 +31,7 @@ export type DefaultKeyboardShortcuts = {
 
 // prettier-ignore
 export type LanguageSetting =
-  | 'system' | 'en' | 'es' | 'fr' | 'de' | 'it' | 'pt' | 'id' | 'ms' | 'vi'
+  | 'system' | 'fa' | 'en' | 'es' | 'fr' | 'de' | 'it' | 'pt' | 'id' | 'ms' | 'vi'
   | 'hi' | 'ja' | 'ko' | 'ru' | 'tr' | 'zh-CN' | 'zh-TW';
 
 export interface Settings {
@@ -56,6 +56,7 @@ export interface Settings {
   seenAnnouncementIds: string[];
   recentModels: RecentModel[];
   useLegacyAgentLoop: boolean;
+  houshiar_models?: string[];
 }
 
 export type SettingKey = keyof Settings;

@@ -13,8 +13,7 @@ const i18n = defineMessages({
   },
   description: {
     id: 'permissionRulesModal.description',
-    defaultMessage:
-      'Configure tool permissions for extensions to control how they interact with your system.',
+    defaultMessage: 'Configure tool permissions for extensions to control how they interact with your system.',
   },
   extensionRules: {
     id: 'permissionRulesModal.extensionRules',

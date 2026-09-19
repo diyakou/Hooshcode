@@ -32,8 +32,7 @@ const i18n = defineMessages({
   },
   noActiveSessionDescription: {
     id: 'permissionModal.noActiveSessionDescription',
-    defaultMessage:
-      'Start a chat session first to configure tool permissions for this extension. Tool permissions are loaded from the active session\'s extensions.',
+    defaultMessage: 'Start a chat session first to configure tool permissions for this extension. Tool permissions are loaded from the active session\'s extensions.',
   },
   failedToLoadTools: {
     id: 'permissionModal.failedToLoadTools',
@@ -41,8 +40,7 @@ const i18n = defineMessages({
   },
   failedToLoadToolsDescription: {
     id: 'permissionModal.failedToLoadToolsDescription',
-    defaultMessage:
-      'Could not load tools for this extension. The extension may not be loaded in the current session.',
+    defaultMessage: 'Could not load tools for this extension. The extension may not be loaded in the current session.',
   },
   noToolsAvailable: {
     id: 'permissionModal.noToolsAvailable',

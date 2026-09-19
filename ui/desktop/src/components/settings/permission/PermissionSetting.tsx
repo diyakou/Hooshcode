@@ -14,8 +14,7 @@ const i18n = defineMessages({
   },
   permissionRulesDescription: {
     id: 'permissionSetting.permissionRulesDescription',
-    defaultMessage:
-      'Hidden instructions that will be passed to the provider to help direct and add context to your responses.',
+    defaultMessage: 'Hidden instructions that will be passed to the provider to help direct and add context to your responses.',
   },
   extensionRules: {
     id: 'permissionSetting.extensionRules',

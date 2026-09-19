@@ -25,13 +25,11 @@ const i18n = defineMessages({
   },
   createSubtitle: {
     id: 'createEditRecipe.createSubtitle',
-    defaultMessage:
-      'Create a new recipe to define agent behavior and capabilities for reusable chat sessions.',
+    defaultMessage: 'Create a new recipe to define agent behavior and capabilities for reusable chat sessions.',
   },
   editSubtitle: {
     id: 'createEditRecipe.editSubtitle',
-    defaultMessage:
-      "You can edit the recipe below to change the agent's behavior in a new session.",
+    defaultMessage: "You can edit the recipe below to change the agent's behavior in a new session.",
   },
   learnMore: {
     id: 'createEditRecipe.learnMore',

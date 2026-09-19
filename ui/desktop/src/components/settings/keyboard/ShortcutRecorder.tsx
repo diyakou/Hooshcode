@@ -23,8 +23,7 @@ const i18n = defineMessages({
   },
   conflictWarning: {
     id: 'shortcutRecorder.conflictWarning',
-    defaultMessage:
-      'This shortcut is already used by {label}. Saving will reassign it to this action.',
+    defaultMessage: 'This shortcut is already used by {label}. Saving will reassign it to this action.',
   },
 });
 

@@ -25,9 +25,11 @@ use std::sync::{
 mod docx_tool;
 mod pdf_tool;
 mod xlsx_tool;
+#[cfg(target_os = "windows")]
+mod windows;
 
-/// Parameters for the computer_control tool (macOS — Peekaboo CLI passthrough)
-#[cfg(target_os = "macos")]
+/// Parameters for the computer_control tool (macOS Peekaboo / Windows Native GUI automation)
+#[cfg(any(target_os = "macos", target_os = "windows"))]
 #[derive(Debug, Serialize, Deserialize, JsonSchema)]
 pub struct ComputerControlParams {
     /// The peekaboo subcommand and arguments as a single string.
@@ -339,7 +341,42 @@ impl ComputerControllerServer {
               - Use `capture_screenshot: true` on click/type/press actions to verify the result
             "#};
 
-        #[cfg(not(target_os = "macos"))]
+        #[cfg(target_os = "windows")]
+        let os_specific_instructions = indoc! {r#"
+            Here are some extra tools:
+            computer_control — Native Windows GUI automation for mouse, keyboard, and screen capture.
+              Pass a command string as the `command` parameter.
+              Set `capture_screenshot: true` to capture and verify the screen after actions.
+
+              Quickstart:
+                1. command: "see"                             — capture full screen to see UI & coordinates
+                2. command: "see --app Photoshop"             — bring Photoshop to front and screenshot
+                3. command: "click --coords 500,300"          — click at (x, y) coordinates
+                4. command: "click --coords 500,300 --double" — double-click at coordinates
+                5. command: "click --coords 500,300 --right"  — right-click at coordinates
+                6. command: "move --coords 500,300"           — move mouse cursor
+                7. command: "drag --from 100,200 --to 400,500"— drag mouse (timeline scrub, clip move, sliders)
+                8. command: "type \"my text\" --return"       — paste text and press enter
+                9. command: "press space"                     — press key (space=play/pause in Premiere, etc.)
+                10. command: "press tab --count 3"            — press key multiple times
+                11. command: "hotkey --keys ctrl,s"           — save file
+                12. command: "hotkey --keys ctrl,z"           — undo
+                13. command: "hotkey --keys ctrl,k"           — cut clip at playhead (Premiere Pro)
+                14. command: "hotkey --keys ctrl,m"           — export media dialog (Premiere Pro)
+                15. command: "hotkey --keys ctrl,t"           — free transform (Photoshop)
+                16. command: "app switch Photoshop"           — activate and bring Photoshop window to focus
+                17. command: "app switch Premiere"            — activate Premiere Pro window
+                18. command: "list windows"                   — list all open windows and titles
+
+              Tips for Creative Apps (Photoshop & Premiere Pro):
+              - Always use "app switch Photoshop" or "app switch Premiere" before performing actions.
+              - Use "see" with capture_screenshot: true to inspect timeline, layers, canvas, or dialogs.
+              - In Premiere: 'space' plays/pauses, 'c' activates Razor tool, 'v' activates Selection tool, 'ctrl,k' cuts at playhead.
+              - In Photoshop: 'v' is move, 'b' is brush, 'ctrl,t' is transform, 'ctrl,j' duplicates layer.
+              - Use "drag" to move timeline clips, adjust sliders, or draw selections.
+        "#};
+
+        #[cfg(not(any(target_os = "macos", target_os = "windows")))]
         let os_specific_instructions = indoc! {r#"
             Use the shell (developer extension) for system automation and scripting tasks.
         "#};
@@ -367,6 +404,10 @@ impl ComputerControllerServer {
         #[cfg(target_os = "macos")]
         {
             tool_router += Self::tool_router_macos();
+        }
+        #[cfg(target_os = "windows")]
+        {
+            tool_router += Self::tool_router_windows();
         }
 
         Self {
@@ -872,6 +913,37 @@ impl ComputerControllerServer {
         params: Parameters<ComputerControlParams>,
     ) -> Result<CallToolResult, ErrorData> {
         self.peekaboo_impl(params).await
+    }
+}
+
+#[cfg(target_os = "windows")]
+#[tool_router(router = tool_router_windows)]
+impl ComputerControllerServer {
+    /// Control the computer using native Windows GUI automation for mouse, keyboard, screenshots, and app switching.
+    #[tool(
+        name = "computer_control",
+        description = "
+            Windows UI automation for mouse, keyboard, screenshots, and app control.
+            Supported commands:
+            - see / screenshot: Capture screen screenshot (returns image). Optional: --app <name> to focus first.
+            - click --coords x,y [--double] [--right] [--middle]: Click at coordinates or current position.
+            - move --coords x,y: Move mouse cursor.
+            - drag --from x1,y1 --to x2,y2: Click and drag mouse between coordinates (ideal for Premiere timeline & Photoshop sliders/layers).
+            - type --text \"...\" [--return] [--clear]: Type/paste text into active field.
+            - press <key> [--count N]: Press special key (enter, tab, space, escape, backspace, delete, up, down, left, right, f1-f12).
+            - hotkey --keys <k1,k2,...>: Trigger shortcut combo like 'ctrl,s', 'ctrl,z', 'ctrl,shift,z', 'ctrl,k', 'ctrl,m', 'ctrl,t', 'ctrl,j'.
+            - app switch <name>: Bring application to foreground and focus (e.g. 'Photoshop', 'Premiere', 'Code').
+            - list windows: List active desktop windows and titles.
+            
+            Set capture_screenshot=true to capture screen after action to verify result.
+            Specially tailored for Photoshop photo editing and Premiere Pro video editing workflows.
+        "
+    )]
+    pub async fn computer_control(
+        &self,
+        params: Parameters<ComputerControlParams>,
+    ) -> Result<CallToolResult, ErrorData> {
+        self.windows_impl(params).await
     }
 }
 

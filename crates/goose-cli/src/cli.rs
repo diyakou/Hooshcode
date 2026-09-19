@@ -67,7 +67,7 @@ impl From<ServePlatform> for GoosePlatform {
 }
 
 #[derive(Parser)]
-#[command(name = "goose", author, version, display_name = "", about, long_about = None)]
+#[command(name = "houshiar", author, version, display_name = "Houshiar Code", about = "Houshiar Code CLI", long_about = None)]
 pub struct Cli {
     #[command(subcommand)]
     command: Option<Command>,

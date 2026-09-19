@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
-import { Zap, AlertCircle, Plus } from 'lucide-react';
+import { Zap, AlertCircle, Plus, FolderOpen, Trash2 } from 'lucide-react';
 import { ScrollArea } from '../ui/scroll-area';
 import { Card } from '../ui/card';
 import { Button } from '../ui/button';
@@ -10,7 +10,9 @@ import { getInitialWorkingDir } from '../../utils/workingDir';
 import { defineMessages, useIntl } from '../../i18n';
 import { SearchView } from '../conversation/SearchView';
 import { getSearchShortcutText } from '../../utils/keyboardShortcuts';
-import { listSkillSources } from '../../acp/sources';
+import { listSkillSources, deleteSkillSource } from '../../acp/sources';
+import AddSkillDialog from './AddSkillDialog';
+import { toast } from 'react-toastify';
 
 const i18n = defineMessages({
   errorLoadingSkills: {
@@ -28,7 +30,7 @@ const i18n = defineMessages({
   noSkillsDescription: {
     id: 'skillsView.noSkillsDescription',
     defaultMessage:
-      'Skills are loaded from SKILL.md files in ~/.config/agents/skills/, .goose/skills/, or other supported directories.',
+      'Skills are loaded from SKILL.md files in ~/.agents/skills/, .goose/skills/, or other supported directories.',
   },
   noMatchingSkills: {
     id: 'skillsView.noMatchingSkills',
@@ -48,32 +50,92 @@ const i18n = defineMessages({
   },
   skillsDescription: {
     id: 'skillsView.skillsDescription',
-    defaultMessage: 'View installed skills that extend Goose capabilities. {shortcut} to search.',
+    defaultMessage:
+      'View and manage installed skills that extend Houshiar Code capabilities. {shortcut} to search.',
   },
   searchSkillsPlaceholder: {
     id: 'skillsView.searchSkillsPlaceholder',
     defaultMessage: 'Search skills...',
-  },
-  comingSoon: {
-    id: 'skillsView.comingSoon',
-    defaultMessage: 'Coming soon',
   },
 });
 
 interface SkillEntry {
   name: string;
   description: string;
+  path: string;
+  writable: boolean;
 }
 
-function SkillItem({ skill }: { skill: SkillEntry }) {
+function SkillItem({
+  skill,
+  onDeleted,
+}: {
+  skill: SkillEntry;
+  onDeleted: () => void;
+}) {
+  const isCustom = skill.writable && !skill.path.startsWith('builtin://');
+
+  const handleDelete = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!window.confirm(`Are you sure you want to delete skill "${skill.name}"?`)) {
+      return;
+    }
+    try {
+      await deleteSkillSource(skill.path);
+      toast.success(`Skill "${skill.name}" was removed.`);
+      onDeleted();
+    } catch (err) {
+      toast.error(errorMessage(err, 'Failed to delete skill'));
+    }
+  };
+
+  const handleOpenLocation = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    try {
+      await window.electron.openDirectoryInExplorer(skill.path);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   return (
-    <Card className="py-2 px-4 mb-2 bg-background-primary border-none hover:bg-background-secondary transition-all duration-150">
+    <Card className="py-2.5 px-4 mb-2 bg-background-primary border-none hover:bg-background-secondary transition-all duration-150 group">
       <div className="flex justify-between items-center gap-4">
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2 mb-1">
-            <h3 className="text-base truncate">{skill.name}</h3>
+            <h3 className="text-base font-medium truncate">{skill.name}</h3>
+            {isCustom && (
+              <span className="text-[10px] uppercase font-mono px-1.5 py-0.5 rounded bg-primary/10 text-primary">
+                Custom
+              </span>
+            )}
           </div>
           <p className="text-text-secondary text-sm line-clamp-2">{skill.description}</p>
+        </div>
+
+        <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+          {isCustom && (
+            <>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-8 w-8 p-0 text-text-secondary hover:text-text-primary"
+                onClick={handleOpenLocation}
+                title="Open skill directory"
+              >
+                <FolderOpen className="w-4 h-4" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-8 w-8 p-0 text-red-500 hover:text-red-700 hover:bg-red-500/10"
+                onClick={handleDelete}
+                title="Delete skill"
+              >
+                <Trash2 className="w-4 h-4" />
+              </Button>
+            </>
+          )}
         </div>
       </div>
     </Card>
@@ -101,6 +163,7 @@ export default function SkillsView() {
   const [error, setError] = useState<string | null>(null);
   const [showContent, setShowContent] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
+  const [isAddOpen, setIsAddOpen] = useState(false);
 
   const filteredSkills = useMemo(() => {
     if (!searchTerm) return skills;
@@ -122,6 +185,8 @@ export default function SkillsView() {
       const skillEntries: SkillEntry[] = sources.map((source) => ({
         name: source.name,
         description: source.description,
+        path: source.path,
+        writable: source.writable ?? false,
       }));
       setSkills(skillEntries);
     } catch (err) {
@@ -130,6 +195,22 @@ export default function SkillsView() {
       setLoading(false);
     }
   }, []);
+
+  const handleOpenSkillsFolder = async () => {
+    try {
+      const isWin = window.electron.platform === 'win32';
+      const homePath = isWin
+        ? (window.appConfig.get('USERPROFILE') as string) || 'C:\\Users\\Administrator'
+        : (window.appConfig.get('HOME') as string) || '/root';
+      const separator = isWin ? '\\' : '/';
+      const skillsDir = `${homePath}${separator}.agents${separator}skills`;
+
+      await window.electron.ensureDirectory(skillsDir);
+      await window.electron.openDirectoryInExplorer(skillsDir);
+    } catch (err) {
+      console.error('Failed to open skills directory:', err);
+    }
+  };
 
   useEffect(() => {
     loadSkills();
@@ -194,7 +275,7 @@ export default function SkillsView() {
     return (
       <div className="space-y-2">
         {filteredSkills.map((skill) => (
-          <SkillItem key={skill.name} skill={skill} />
+          <SkillItem key={skill.path || skill.name} skill={skill} onDeleted={loadSkills} />
         ))}
       </div>
     );
@@ -207,16 +288,27 @@ export default function SkillsView() {
           <div className="flex flex-col page-transition">
             <div className="flex justify-between items-center mb-1">
               <h1 className="text-4xl font-light">{intl.formatMessage(i18n.skillsTitle)}</h1>
-              <Button
-                variant="outline"
-                size="sm"
-                className="flex items-center gap-2"
-                hidden
-                title={intl.formatMessage(i18n.comingSoon)}
-              >
-                <Plus className="w-4 h-4" />
-                {intl.formatMessage(i18n.addSkill)}
-              </Button>
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="flex items-center gap-2"
+                  onClick={handleOpenSkillsFolder}
+                  title="Open local skills folder in File Explorer"
+                >
+                  <FolderOpen className="w-4 h-4" />
+                  Open Skills Folder
+                </Button>
+                <Button
+                  variant="default"
+                  size="sm"
+                  className="flex items-center gap-2"
+                  onClick={() => setIsAddOpen(true)}
+                >
+                  <Plus className="w-4 h-4" />
+                  {intl.formatMessage(i18n.addSkill)}
+                </Button>
+              </div>
             </div>
             <p className="text-sm text-text-secondary mb-1">
               {intl.formatMessage(i18n.skillsDescription, {
@@ -243,6 +335,12 @@ export default function SkillsView() {
           </ScrollArea>
         </div>
       </div>
+
+      <AddSkillDialog
+        open={isAddOpen}
+        onOpenChange={setIsAddOpen}
+        onSkillAdded={loadSkills}
+      />
     </MainPanelLayout>
   );
 }

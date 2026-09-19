@@ -13,6 +13,7 @@ use crate::providers::copilot_acp::{COPILOT_ACP_BINARY, COPILOT_ACP_PROVIDER_NAM
 use crate::providers::formats::anthropic::ANTHROPIC_PROVIDER_NAME;
 use crate::providers::gemini_oauth::TokenCache as GeminiOAuthTokenCache;
 use crate::providers::google::{GOOGLE_API_HOST, GOOGLE_PROVIDER_NAME};
+use crate::providers::houshiar_def::{HOUSHIAR_BASE_URL, HOUSHIAR_PROVIDER_NAME};
 use crate::providers::huggingface::HuggingFaceProvider;
 use crate::providers::huggingface_auth;
 use crate::providers::kimicode;
@@ -21,6 +22,30 @@ use crate::providers::openai::{OPEN_AI_DEFAULT_BASE_PATH, OPEN_AI_PROVIDER_NAME}
 use crate::providers::pi_acp::{PI_ACP_BINARY, PI_ACP_PROVIDER_NAME};
 use crate::providers::xai_oauth::TokenCache as XaiOAuthTokenCache;
 use goose_providers::azure_foundry::{endpoint_kind, EndpointKind, AZURE_FOUNDRY_PROVIDER_NAME};
+
+pub fn houshiar_inventory() -> InventoryRegistration {
+    InventoryRegistration::new(true, || {
+        let config = Config::global();
+        let mut identity =
+            InventoryIdentityInput::new(HOUSHIAR_PROVIDER_NAME, HOUSHIAR_PROVIDER_NAME)
+                .with_public("host", HOUSHIAR_BASE_URL.to_string());
+
+        let api_key = config_secret_value(config, "HOUSHIAR_API_KEY")
+            .or_else(|| config_secret_value(config, "CUSTOM_HOUSHIAR_API_KEY"));
+        if let Some(api_key) = api_key {
+            identity = identity.with_secret("api_key", api_key);
+        }
+        Ok(identity)
+    })
+    .with_configured(|| {
+        Config::global()
+            .get_secret::<serde_json::Value>("HOUSHIAR_API_KEY")
+            .or_else(|_| {
+                Config::global().get_secret::<serde_json::Value>("CUSTOM_HOUSHIAR_API_KEY")
+            })
+            .is_ok()
+    })
+}
 
 pub fn openai_inventory() -> InventoryRegistration {
     InventoryRegistration::new(true, || {

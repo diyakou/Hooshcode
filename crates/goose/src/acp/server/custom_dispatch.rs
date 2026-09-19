@@ -10,6 +10,10 @@ impl GooseAcpAgent {
         params: serde_json::Value,
     ) -> Result<serde_json::Value, agent_client_protocol::Error> {
         let result = async {
+            if method == "goose/houshiar/usage" {
+                return self.on_houshiar_usage().await;
+            }
+
             if <SaveRecipeRequest as agent_client_protocol::JsonRpcMessage>::matches_method(method)
             {
                 let req = recipe::deserialize_save_recipe_request(params)?;
@@ -917,5 +921,59 @@ impl GooseAcpAgent {
     ) -> Result<LocalInferenceBuiltinChatTemplatesListResponse, agent_client_protocol::Error> {
         self.on_local_inference_builtin_chat_templates_list(req)
             .await
+    }
+
+    pub async fn on_houshiar_usage(
+        &self,
+    ) -> Result<serde_json::Value, agent_client_protocol::Error> {
+        let config = self.config()?;
+        let api_key: String = config
+            .get_secret("HOUSHIAR_API_KEY")
+            .or_else(|_| config.get_secret("CUSTOM_HOUSHIAR_API_KEY"))
+            .map_err(|_| {
+                agent_client_protocol::Error::invalid_params()
+                    .data("کلید API هوشیار تنظیم نشده است")
+            })?;
+
+        let client = reqwest::Client::builder()
+            .timeout(std::time::Duration::from_secs(10))
+            .build()
+            .map_err(|e| agent_client_protocol::Error::internal_error().data(e.to_string()))?;
+
+        let endpoints = [
+            "https://api.houshiar-ai.ir/v1/messages/usage",
+            "https://api.houshiar-ai.ir/v1/message/usage",
+            "https://wqai.morvism.ir/v1/messages/usage",
+            "https://wqai.morvism.ir/v1/message/usage",
+        ];
+
+        let mut last_err = String::new();
+        for endpoint in endpoints {
+            let res = client
+                .get(endpoint)
+                .header("x-api-key", &api_key)
+                .header("Authorization", format!("Bearer {}", api_key))
+                .header("x-client-brand", "houshiar-code")
+                .send()
+                .await;
+
+            match res {
+                Ok(resp) => {
+                    if resp.status().is_success() {
+                        let json: serde_json::Value = resp.json().await.map_err(|e| {
+                            agent_client_protocol::Error::internal_error().data(e.to_string())
+                        })?;
+                        return Ok(json);
+                    } else {
+                        last_err = format!("Endpoint {} returned {}", endpoint, resp.status());
+                    }
+                }
+                Err(e) => {
+                    last_err = format!("Error reaching {}: {}", endpoint, e);
+                }
+            }
+        }
+
+        Err(agent_client_protocol::Error::internal_error().data(last_err))
     }
 }

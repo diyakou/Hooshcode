@@ -10,6 +10,7 @@ import XaiLogo from './icons/xai@3x.png';
 import MiniMaxLogo from './icons/minimax@3x.png';
 import TanzuLogo from './icons/tanzu@3x.png';
 import AzureFoundryLogo from './icons/azure_foundry@3x.png';
+import HoushiarLogo from './icons/houshiar@3x.png';
 import DefaultLogo from './icons/default@3x.png';
 import { defineMessages, useIntl } from '../../../../../i18n';
 
@@ -22,6 +23,7 @@ const i18n = defineMessages({
 
 // Map provider names to their logos
 const providerLogos: Record<string, string> = {
+  houshiar: HoushiarLogo,
   openai: OpenAILogo,
   anthropic: AnthropicLogo,
   google: GoogleLogo,

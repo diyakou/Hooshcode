@@ -12,8 +12,7 @@ const i18n = defineMessages({
   },
   description: {
     id: 'diagnosticsModal.description',
-    defaultMessage:
-      'You can download a diagnostics JSON report to share with the team, or file a bug directly on GitHub with your system details pre-filled. A diagnostics report contains the following:',
+    defaultMessage: 'You can download a diagnostics JSON report to share with the team, or file a bug directly on GitHub with your system details pre-filled. A diagnostics report contains the following:',
   },
   systemInfo: {
     id: 'diagnosticsModal.systemInfo',
@@ -33,8 +32,7 @@ const i18n = defineMessages({
   },
   sensitiveWarning: {
     id: 'diagnosticsModal.sensitiveWarning',
-    defaultMessage:
-      'If your session contains sensitive information, do not share the diagnostics file publicly.',
+    defaultMessage: 'If your session contains sensitive information, do not share the diagnostics file publicly.',
   },
   attachHint: {
     id: 'diagnosticsModal.attachHint',

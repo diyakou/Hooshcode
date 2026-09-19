@@ -929,10 +929,6 @@
   "dirSwitcher.enterPathInvalid": {
     "defaultMessage": "Working directory must be an absolute path"
   },
-
-
-
-
   "dirSwitcher.failedToUpdateWorkingDir": {
     "defaultMessage": "Не удалось обновить рабочий каталог"
   },
@@ -2172,9 +2168,6 @@
   "modelAndProviderContext.unknownProviderTitle": {
     "defaultMessage": "Поиск имени провайдера"
   },
-  "modelSettingsButtons.configureProviders": {
-    "defaultMessage": "Настроить провайдеров"
-  },
   "modelSettingsButtons.switchModels": {
     "defaultMessage": "Переключить модели"
   },
@@ -2426,12 +2419,6 @@
   },
   "onboardingGuard.retry": {
     "defaultMessage": "Повторить"
-  },
-  "onboardingGuard.welcomeDescription": {
-    "defaultMessage": "Ваш локальный ИИ-агент. Подключите провайдера ИИ-модели, чтобы начать."
-  },
-  "onboardingGuard.welcomeTitle": {
-    "defaultMessage": "Добро пожаловать в goose"
   },
   "onboardingSuccess.allSet": {
     "defaultMessage": "Все готово для начала работы с goose."
@@ -4772,5 +4759,8 @@
   },
   "settings.agentLoop.title": {
     "defaultMessage": "Цикл агента"
+  },
+  "settings.language.persian": {
+    "defaultMessage": "Persian (فارسی)"
   }
 }

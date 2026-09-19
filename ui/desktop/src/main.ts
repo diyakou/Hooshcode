@@ -142,6 +142,65 @@ const MENU_TRANSLATIONS_ZH_CN: Record<string, string> = {
   Services: '服务',
 };
 
+const MENU_TRANSLATIONS_FA: Record<string, string> = {
+  // Top-level
+  File: 'پرونده',
+  Edit: 'ویرایش',
+  View: 'نمایش',
+  Window: 'پنجره',
+  Help: 'راهنما',
+  // Context menu
+  'Add to dictionary': 'افزودن به فرهنگ لغت',
+  Cut: 'بریدن',
+  Copy: 'کپی',
+  Paste: 'چسباندن',
+  // Goose / Houshiar items
+  'New Window': 'پنجره جدید',
+  Settings: 'تنظیمات',
+  'Find…': 'یافتن…',
+  'Find Next': 'یافتن بعدی',
+  'Find Previous': 'یافتن قبلی',
+  'Use Selection for Find': 'استفاده از انتخاب برای یافتن',
+  Find: 'یافتن',
+  'New Chat': 'گفتگوی جدید',
+  'New Chat Window': 'پنجره گفتگوی جدید',
+  'Open Directory...': 'باز کردن پوشه…',
+  'Recent Directories': 'پوشه‌های اخیر',
+  'Focus Goose Window': 'تمرکز روی پنجره هوشیار',
+  'Quick Launcher': 'راه‌انداز سریع',
+  'Always on Top': 'همیشه در بالا',
+  'Toggle Navigation': 'تغییر وضعیت نوار ناوبری',
+  'About Goose': 'درباره هوشیار کد',
+  'About Houshiar Code': 'درباره هوشیار کد',
+  // Electron default items
+  Undo: 'واگرد (Undo)',
+  Redo: 'از نو (Redo)',
+  'Select All': 'انتخاب همه',
+  Delete: 'حذف',
+  Speech: 'گفتار',
+  Reload: 'بارگذاری مجدد',
+  'Force Reload': 'بارگذاری مجدد اجباری',
+  'Toggle Developer Tools': 'ابزارهای توسعه‌دهنده',
+  'Actual Size': 'اندازه واقعی',
+  'Reset Zoom': 'بزرگ‌نمایی پیش‌فرض',
+  'Zoom In': 'بزرگ‌نمایی',
+  'Zoom Out': 'کوچک‌نمایی',
+  'Toggle Full Screen': 'حالت تمام‌صفحه',
+  'Toggle Fullscreen': 'حالت تمام‌صفحه',
+  Minimize: 'کمینه‌سازی',
+  Close: 'بستن',
+  'Close Window': 'بستن پنجره',
+  Quit: 'خروج',
+  Exit: 'خروج',
+  'Bring All to Front': 'انتقال همه به جلو',
+  'Emoji & Symbols': 'شکلک‌ها و نمادها',
+  'Start Dictation…': 'شروع تایپ صوتی…',
+  'Hide Goose': 'مخفی کردن هوشیار',
+  'Hide Others': 'مخفی کردن سایرین',
+  'Show All': 'نمایش همه',
+  Services: 'خدمات',
+};
+
 function detectMenuLocale(): string {
   return getConfiguredGooseLocale() ?? 'en';
 }
@@ -149,6 +208,9 @@ function detectMenuLocale(): string {
 function menuT(label: string): string {
   // Normalize underscores to hyphens so POSIX-style tags like "zh_CN" work.
   const lower = detectMenuLocale().replace(/_/g, '-').toLowerCase();
+  if (lower === 'fa' || lower.startsWith('fa-')) {
+    return MENU_TRANSLATIONS_FA[label] ?? label;
+  }
   const isTraditional = /^zh-(hant|tw|hk|mo)\b/.test(lower);
   const isSimplifiedChinese = !isTraditional && (lower === 'zh' || lower.startsWith('zh-'));
   if (isSimplifiedChinese) {
@@ -183,6 +245,7 @@ const SETTINGS_FILE = path.join(app.getPath('userData'), 'settings.json');
 const STARTUP_LOGS_DIR = path.join(app.getPath('userData'), 'logs', 'startup');
 const validLanguageSettings = new Set<Settings['language']>([
   'system',
+  'fa',
   'en',
   'es',
   'fr',
@@ -817,7 +880,7 @@ async function handleFileOpen(filePath: string) {
 
     // Show user-friendly error notification
     new Notification({
-      title: 'Goose',
+      title: 'Houshiar Code',
       body: `Could not open directory: ${path.basename(filePath)}`,
     }).show();
   }
@@ -1232,7 +1295,7 @@ const createChat = async (
       log.error('goose serve failed to start', error);
       dialog.showMessageBoxSync({
         type: 'error',
-        title: 'Goose Failed to Start',
+        title: 'Houshiar Code Failed to Start',
         message: 'The backend server failed to start.',
         detail: [
           'Backend: goose serve',
@@ -1276,6 +1339,7 @@ const createChat = async (
     });
 
     mainWindow = new BrowserWindow({
+      title: 'Houshiar Code',
       show: false,
       titleBarStyle: process.platform === 'darwin' ? 'hidden' : 'default',
       trafficLightPosition: process.platform === 'darwin' ? { x: 20, y: 16 } : undefined,
@@ -1292,7 +1356,24 @@ const createChat = async (
       minWidth: 480,
       minHeight: 400,
       resizable: true,
-      icon: path.join(__dirname, '../images/icon.icns'),
+      icon: ((): string => {
+        const iconName =
+          process.platform === 'win32'
+            ? 'icon.ico'
+            : process.platform === 'darwin'
+              ? 'icon.icns'
+              : 'icon.png';
+        const candidates = [
+          path.join(process.resourcesPath, 'images', iconName),
+          path.join(process.cwd(), 'src', 'images', iconName),
+          path.join(__dirname, '..', 'images', iconName),
+          path.join(__dirname, 'images', iconName),
+        ];
+        return (
+          candidates.find((p) => fsSync.existsSync(p)) ||
+          path.join(__dirname, '../images', iconName)
+        );
+      })(),
       webPreferences: {
         spellcheck: settings.spellcheckEnabled ?? true,
         preload: path.join(__dirname, 'preload.js'),
@@ -2687,7 +2768,7 @@ async function appMain() {
     if (shortcuts.focusWindow) {
       fileMenu.submenu.append(
         new MenuItem({
-          label: menuT('Focus Goose Window'),
+          label: menuT('Focus Houshiar Code Window'),
           accelerator: shortcuts.focusWindow,
           click() {
             focusWindow();
@@ -2794,9 +2875,9 @@ async function appMain() {
         helpMenu.submenu.append(new MenuItem({ type: 'separator' }));
       }
 
-      // Create the About Goose menu item with a submenu
+      // Create the About Houshiar Code menu item with a submenu
       const aboutGooseMenuItem = new MenuItem({
-        label: menuT('About Goose'),
+        label: menuT('About Houshiar Code'),
         submenu: Menu.buildFromTemplate([]), // Start with an empty submenu for About
       });
 
@@ -3137,7 +3218,7 @@ app.whenReady().then(async () => {
   try {
     await appMain();
   } catch (error) {
-    dialog.showErrorBox('Goose Error', `Failed to create main window: ${error}`);
+    dialog.showErrorBox('Houshiar Code Error', `Failed to create main window: ${error}`);
     app.quit();
   }
 });

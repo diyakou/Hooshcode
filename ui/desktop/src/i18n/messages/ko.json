@@ -929,10 +929,6 @@
   "dirSwitcher.enterPathInvalid": {
     "defaultMessage": "Working directory must be an absolute path"
   },
-
-
-
-
   "dirSwitcher.failedToUpdateWorkingDir": {
     "defaultMessage": "작업 디렉터리를 업데이트하지 못했습니다."
   },
@@ -2172,9 +2168,6 @@
   "modelAndProviderContext.unknownProviderTitle": {
     "defaultMessage": "제공업체 이름 조회"
   },
-  "modelSettingsButtons.configureProviders": {
-    "defaultMessage": "제공업체 설정"
-  },
   "modelSettingsButtons.switchModels": {
     "defaultMessage": "모델 전환"
   },
@@ -2426,12 +2419,6 @@
   },
   "onboardingGuard.retry": {
     "defaultMessage": "다시 시도"
-  },
-  "onboardingGuard.welcomeDescription": {
-    "defaultMessage": "로컬 AI 에이전트입니다. 시작하려면 AI 모델 제공업체를 연결하세요."
-  },
-  "onboardingGuard.welcomeTitle": {
-    "defaultMessage": "goose에 오신 것을 환영합니다"
   },
   "onboardingSuccess.allSet": {
     "defaultMessage": "goose를 사용할 준비가 모두 완료되었습니다."
@@ -4772,5 +4759,8 @@
   },
   "settings.agentLoop.title": {
     "defaultMessage": "에이전트 루프"
+  },
+  "settings.language.persian": {
+    "defaultMessage": "Persian (فارسی)"
   }
 }

@@ -254,8 +254,7 @@ const i18n = defineMessages({
   },
   recipesDescription: {
     id: 'recipesView.recipesDescription',
-    defaultMessage:
-      'View and manage your saved recipes to quickly start new sessions with predefined configurations. {shortcut} to search.',
+    defaultMessage: 'View and manage your saved recipes to quickly start new sessions with predefined configurations. {shortcut} to search.',
   },
   searchRecipesPlaceholder: {
     id: 'recipesView.searchRecipesPlaceholder',

@@ -93,8 +93,7 @@ const i18n = defineMessages({
   },
   apiBasePathHint: {
     id: 'customProviderForm.apiBasePathHint',
-    defaultMessage:
-      "Override the default API path. Leave blank to use the provider's default path.",
+    defaultMessage: "Override the default API path. Leave blank to use the provider's default path.",
   },
   authentication: {
     id: 'customProviderForm.authentication',
@@ -154,8 +153,7 @@ const i18n = defineMessages({
   },
   customHeadersHint: {
     id: 'customProviderForm.customHeadersHint',
-    defaultMessage:
-      'Add custom HTTP headers to include in requests to the provider. Click the "+" button to add after filling both fields.',
+    defaultMessage: 'Add custom HTTP headers to include in requests to the provider. Click the "+" button to add after filling both fields.',
   },
   headerNamePlaceholder: {
     id: 'customProviderForm.headerNamePlaceholder',
@@ -203,13 +201,11 @@ const i18n = defineMessages({
   },
   cannotDeleteActive: {
     id: 'customProviderForm.cannotDeleteActive',
-    defaultMessage:
-      "You cannot delete this provider while it's currently in use. Please switch to a different model first.",
+    defaultMessage: "You cannot delete this provider while it's currently in use. Please switch to a different model first.",
   },
   deleteConfirmation: {
     id: 'customProviderForm.deleteConfirmation',
-    defaultMessage:
-      'Are you sure you want to delete this custom provider? This will permanently remove the provider and its stored API key. This action cannot be undone.',
+    defaultMessage: 'Are you sure you want to delete this custom provider? This will permanently remove the provider and its stored API key. This action cannot be undone.',
   },
   confirmDelete: {
     id: 'customProviderForm.confirmDelete',

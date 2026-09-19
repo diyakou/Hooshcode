@@ -16,6 +16,10 @@ name = "goose"
 path = "src/main.rs"
 
 [[bin]]
+name = "houshiar"
+path = "src/bin/houshiar.rs"
+
+[[bin]]
 name = "generate_manpages"
 path = "src/bin/generate_manpages.rs"
 
@@ -94,13 +98,7 @@ libc = { version = "0.2.182", default-features = false, features = ["std"] }
 [features]
 default = [
     "code-mode",
-    "local-inference",
-    "aws-providers",
-    "telemetry",
-    "nostr",
-    "otel",
     "rustls-tls",
-    "live-voice",
     "system-keyring",
     "update",
 ]

@@ -16,8 +16,7 @@ import { defineMessages, useIntl } from '../../../i18n';
 const i18n = defineMessages({
   gpuAcceleration: {
     id: 'localModelManager.gpuAcceleration',
-    defaultMessage:
-      'Supports GPU acceleration (CUDA for NVIDIA, Metal for Apple Silicon). GPU features must be enabled at build time for hardware acceleration.',
+    defaultMessage: 'Supports GPU acceleration (CUDA for NVIDIA, Metal for Apple Silicon). GPU features must be enabled at build time for hardware acceleration.',
   },
   recommended: {
     id: 'localModelManager.recommended',

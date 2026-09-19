@@ -104,11 +104,15 @@ export async function acpListProviderDetails(): Promise<ProviderDetails[]> {
 
 export async function acpListSetupProviderDetails(): Promise<ProviderDetails[]> {
   const providers = await acpListProviderDetails();
+  const houshiarOnly = providers.filter((provider) => provider.name.toLowerCase() === 'houshiar');
+  if (houshiarOnly.length > 0) return houshiarOnly;
   return providers.filter((provider) => provider.visible_in_setup);
 }
 
 export async function acpListSettingsProviderDetails(): Promise<ProviderDetails[]> {
   const providers = await acpListProviderDetails();
+  const houshiarOnly = providers.filter((provider) => provider.name.toLowerCase() === 'houshiar');
+  if (houshiarOnly.length > 0) return houshiarOnly;
   return providers.filter((provider) => provider.visible_in_setup || provider.is_configured);
 }
 
@@ -204,6 +208,12 @@ export async function acpListProviderModels(providerId: string) {
   return entries.find((e) => e.providerId === providerId)?.models ?? [];
 }
 
+export async function acpListProviderSupportedModels(providerId: string): Promise<string[]> {
+  const client = await getAcpClient();
+  const response = await client.goose.providersSupportedModelsList_unstable({ providerId });
+  return response.models;
+}
+
 export async function acpListProviderCatalogEntries(
   format?: string
 ): Promise<ProviderTemplateCatalogEntryDto[]> {
@@ -292,7 +302,7 @@ export async function acpAuthenticateProvider(providerId: string): Promise<void>
 export async function acpListProviderSecrets(): Promise<ProviderSecretDto[]> {
   const client = await getAcpClient();
   const { secrets } = await client.goose.providersSecretsList_unstable({});
-  return secrets;
+  return secrets.filter((secret) => secret.provider?.toLowerCase().includes('houshiar'));
 }
 
 export async function acpDeleteProviderSecret(id: string): Promise<void> {

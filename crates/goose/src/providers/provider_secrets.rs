@@ -402,14 +402,16 @@ pub async fn list_provider_secrets() -> Result<Vec<ProviderSecret>, ConfigError>
         }
     }
 
-    let huggingface_secret = build_huggingface_oauth_secret(huggingface_auth::load_oauth_token());
-    if let Some(existing) = secrets
-        .iter_mut()
-        .find(|existing| existing.id == huggingface_secret.id)
-    {
-        *existing = huggingface_secret;
-    } else {
-        secrets.push(huggingface_secret);
+    if let Some(token) = huggingface_auth::load_oauth_token() {
+        let huggingface_secret = build_huggingface_oauth_secret(Some(token));
+        if let Some(existing) = secrets
+            .iter_mut()
+            .find(|existing| existing.id == huggingface_secret.id)
+        {
+            *existing = huggingface_secret;
+        } else {
+            secrets.push(huggingface_secret);
+        }
     }
 
     secrets.sort_by(|a, b| {

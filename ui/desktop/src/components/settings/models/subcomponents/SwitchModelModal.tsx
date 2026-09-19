@@ -78,7 +78,7 @@ const i18n = defineMessages({
   },
   description: {
     id: 'switchModelModal.description',
-    defaultMessage: 'Select a provider and model to use for your conversations.',
+    defaultMessage: 'Select a model to use for your conversations.',
   },
   chooseModel: {
     id: 'switchModelModal.chooseModel',
@@ -114,8 +114,7 @@ const i18n = defineMessages({
   },
   localModelsDescription: {
     id: 'switchModelModal.localModelsDescription',
-    defaultMessage:
-      'To use local inference, you need to download a model to your computer first. Go to Settings → Models to manage local models.',
+    defaultMessage: 'To use local inference, you need to download a model to your computer first. Go to Settings → Models to manage local models.',
   },
   goToSettings: {
     id: 'switchModelModal.goToSettings',
@@ -277,7 +276,6 @@ export const SwitchModelModal = ({
   // Use session-specific model/provider if available, otherwise fall back to config defaults
   const currentModel = sessionModel ?? configModel;
   const currentProvider = sessionProvider ?? configProvider;
-  const [providerOptions, setProviderOptions] = useState<{ value: string; label: string }[]>([]);
   type ModelOption = {
     value: string;
     label: string;
@@ -287,7 +285,7 @@ export const SwitchModelModal = ({
   };
   const [modelOptions, setModelOptions] = useState<{ options: ModelOption[] }[]>([]);
   const [provider, setProvider] = useState<string | null>(
-    initialProvider || currentProvider || null
+    initialProvider || currentProvider || 'houshiar'
   );
   const [model, setModel] = useState<string>(
     initialProvider && initialProvider !== currentProvider ? '' : currentModel || ''
@@ -488,18 +486,11 @@ export const SwitchModelModal = ({
     (async () => {
       try {
         const providersResponse = await acpListProviderDetails();
-        const activeProviders = providersResponse.filter((provider) => provider.is_configured);
+        const activeProviders = providersResponse.filter(
+          (provider) => provider.is_configured && provider.name.toLowerCase() === 'houshiar'
+        );
         setActiveProvidersList(activeProviders);
-        setProviderOptions([
-          ...activeProviders.map(({ metadata, name }) => ({
-            value: name,
-            label: metadata.display_name,
-          })),
-          {
-            value: 'configure_providers',
-            label: intl.formatMessage(i18n.useOtherProvider),
-          },
-        ]);
+        setProvider('houshiar');
       } catch (error: unknown) {
         console.error('Failed to query providers:', error);
       }
@@ -818,31 +809,6 @@ export const SwitchModelModal = ({
           ) : (
             /* Manual Provider/Model Selection */
             <div className="w-full flex flex-col gap-4">
-              <div>
-                <Select
-                  options={providerOptions}
-                  value={providerOptions.find((option) => option.value === provider) || null}
-                  onChange={(newValue: unknown) => {
-                    const option = newValue as { value: string; label: string } | null;
-                    if (option?.value === 'configure_providers') {
-                      // Navigate to ConfigureProviders view
-                      setView('ConfigureProviders');
-                      onClose(); // Close the current modal
-                    } else {
-                      setProvider(option?.value || null);
-                      setModel('');
-                      setIsCustomModel(false);
-                      setUserClearedModel(false);
-                    }
-                  }}
-                  placeholder={intl.formatMessage(i18n.providerPlaceholder)}
-                  isClearable
-                />
-                {attemptedSubmit && validationErrors.provider && (
-                  <div className="text-red-500 text-sm mt-1">{validationErrors.provider}</div>
-                )}
-              </div>
-
               {provider && (
                 <>
                   {provider === 'local' &&

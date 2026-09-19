@@ -83,7 +83,7 @@ const i18n = defineMessages({
   importNostrTitle: { id: 'sessions.importNostr.title', defaultMessage: 'Import Nostr Session' },
   importNostrDesc: {
     id: 'sessions.importNostr.description',
-    defaultMessage: 'Paste a Goose Nostr share link to fetch, decrypt, and import the session.',
+    defaultMessage: 'Paste a Houshiar Code Nostr share link to fetch, decrypt, and import the session.',
   },
   importNostrPlaceholder: {
     id: 'sessions.importNostr.placeholder',
@@ -92,7 +92,7 @@ const i18n = defineMessages({
   importing: { id: 'sessions.importing', defaultMessage: 'Importing...' },
   chatHistoryDesc: {
     id: 'sessions.chatHistoryDesc',
-    defaultMessage: 'View and search your past conversations with Goose. {shortcut} to search.',
+    defaultMessage: 'View and search your past conversations with Houshiar Code. {shortcut} to search.',
   },
   searchPlaceholder: { id: 'sessions.searchPlaceholder', defaultMessage: 'Search history...' },
   errorLoading: { id: 'sessions.error.loading', defaultMessage: 'Error Loading Sessions' },
@@ -111,8 +111,7 @@ const i18n = defineMessages({
   deleteTitle: { id: 'sessions.delete.title', defaultMessage: 'Delete Session' },
   deleteMessage: {
     id: 'sessions.delete.message',
-    defaultMessage:
-      'Are you sure you want to delete the session "{name}"? This action cannot be undone.',
+    defaultMessage: 'Are you sure you want to delete the session "{name}"? This action cannot be undone.',
   },
   duplicateSuccess: {
     id: 'sessions.toast.duplicated',
@@ -163,8 +162,7 @@ const i18n = defineMessages({
   },
   shareNostrDesc: {
     id: 'sessions.shareNostr.description',
-    defaultMessage:
-      'Anyone with this link can fetch and decrypt the session. Treat it like a secret.',
+    defaultMessage: 'Anyone with this link can fetch and decrypt the session. Treat it like a secret.',
   },
   close: { id: 'sessions.close', defaultMessage: 'Close' },
   scheduledJobs: {

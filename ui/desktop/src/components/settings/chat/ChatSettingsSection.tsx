@@ -15,8 +15,7 @@ const i18n = defineMessages({
   },
   modeDescription: {
     id: 'chatSettings.modeDescription',
-    defaultMessage:
-      'Choose the default mode Goose uses for new sessions. Existing sessions keep their current mode.',
+    defaultMessage: 'Choose the default mode Houshiar Code uses for new sessions. Existing sessions keep their current mode.',
   },
   responseStylesTitle: {
     id: 'chatSettings.responseStylesTitle',
@@ -24,7 +23,7 @@ const i18n = defineMessages({
   },
   responseStylesDescription: {
     id: 'chatSettings.responseStylesDescription',
-    defaultMessage: 'Choose how Goose should format and style its responses',
+    defaultMessage: 'Choose how Houshiar Code should format and style its responses',
   },
 });
 

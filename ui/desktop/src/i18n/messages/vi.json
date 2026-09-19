@@ -929,10 +929,6 @@
   "dirSwitcher.enterPathInvalid": {
     "defaultMessage": "Working directory must be an absolute path"
   },
-
-
-
-
   "dirSwitcher.failedToUpdateWorkingDir": {
     "defaultMessage": "Không thể cập nhật thư mục làm việc"
   },
@@ -2172,9 +2168,6 @@
   "modelAndProviderContext.unknownProviderTitle": {
     "defaultMessage": "Tra cứu tên nhà cung cấp"
   },
-  "modelSettingsButtons.configureProviders": {
-    "defaultMessage": "Cấu hình nhà cung cấp"
-  },
   "modelSettingsButtons.switchModels": {
     "defaultMessage": "Chuyển đổi mô hình"
   },
@@ -2426,12 +2419,6 @@
   },
   "onboardingGuard.retry": {
     "defaultMessage": "Thử lại"
-  },
-  "onboardingGuard.welcomeDescription": {
-    "defaultMessage": "Tác nhân AI cục bộ của bạn. Kết nối một nhà cung cấp mô hình AI để bắt đầu."
-  },
-  "onboardingGuard.welcomeTitle": {
-    "defaultMessage": "Chào mừng đến với goose"
   },
   "onboardingSuccess.allSet": {
     "defaultMessage": "Bạn đã sẵn sàng bắt đầu sử dụng goose."
@@ -4772,5 +4759,8 @@
   },
   "settings.agentLoop.title": {
     "defaultMessage": "Vòng lặp tác nhân"
+  },
+  "settings.language.persian": {
+    "defaultMessage": "Persian (فارسی)"
   }
 }

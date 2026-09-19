@@ -17,10 +17,16 @@ export { defineMessages, useIntl } from 'react-intl';
 /** The set of locales that have translation catalogs. */
 // prettier-ignore
 export const SUPPORTED_LOCALES = [
-  'en', 'es', 'fr', 'de', 'it', 'pt', 'id', 'ms', 'vi', 'hi', 'ja', 'ko', 'ru', 'tr', 'zh-CN', 'zh-TW',
+  'fa', 'en', 'es', 'fr', 'de', 'it', 'pt', 'id', 'ms', 'vi', 'hi', 'ja', 'ko', 'ru', 'tr', 'zh-CN', 'zh-TW',
 ] as const;
 export type SupportedLocale = (typeof SUPPORTED_LOCALES)[number];
 const SUPPORTED_LOCALE_SET = new Set<string>(SUPPORTED_LOCALES);
+
+/** Check whether a given locale string is Right-to-Left (e.g. Persian). */
+export function isRtlLocale(locale: string): boolean {
+  const base = locale.split('-')[0].toLowerCase();
+  return base === 'fa' || base === 'ar' || base === 'he' || base === 'ur';
+}
 
 /**
  * Map Simplified Chinese aliases (zh, zh-Hans*, zh-SG, zh-MY) to "zh-CN" and Traditional

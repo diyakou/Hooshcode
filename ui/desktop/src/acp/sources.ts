@@ -41,3 +41,28 @@ async function loadSkillSources(projectDir: string): Promise<SourceEntry[]> {
         a.path.localeCompare(b.path)
     );
 }
+
+export async function createSkillSource(
+  name: string,
+  description: string,
+  content: string
+): Promise<SourceEntry> {
+  const client = await getAcpClient();
+  const response = await client.goose.sourcesCreate_unstable({
+    type: 'skill',
+    name,
+    description,
+    content,
+    target: { scope: 'global' },
+  });
+  return response.source;
+}
+
+export async function deleteSkillSource(path: string): Promise<void> {
+  const client = await getAcpClient();
+  await client.goose.sourcesDelete_unstable({
+    type: 'skill',
+    path,
+  });
+}
+

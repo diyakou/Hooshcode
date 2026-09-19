@@ -222,9 +222,143 @@ pub fn configure_telemetry_consent_dialog() -> anyhow::Result<bool> {
     Ok(enabled)
 }
 
+pub async fn validate_houshiar_key(api_key: &str) -> anyhow::Result<Vec<String>> {
+    let client = reqwest::Client::builder()
+        .timeout(std::time::Duration::from_secs(15))
+        .build()?;
+    let response = client
+        .get("https://wqai.morvism.ir/v1/models")
+        .header("x-api-key", api_key)
+        .header("anthropic-version", "2023-06-01")
+        .header("x-client-brand", "houshiar-code")
+        .send()
+        .await?;
+
+    if !response.status().is_success() {
+        anyhow::bail!("کلید API نامعتبر است");
+    }
+
+    let json: serde_json::Value = response
+        .json()
+        .await
+        .map_err(|_| anyhow::anyhow!("دریافت مدلها با خطا مواجه شد"))?;
+
+    let arr = json
+        .get("data")
+        .and_then(|v| v.as_array())
+        .or_else(|| json.get("models").and_then(|v| v.as_array()))
+        .or_else(|| json.as_array());
+
+    let mut models: Vec<String> = arr
+        .map(|items| {
+            items
+                .iter()
+                .filter_map(|m| {
+                    m.get("id")
+                        .or_else(|| m.get("name"))
+                        .and_then(|v| v.as_str())
+                        .or_else(|| m.as_str())
+                        .map(str::to_string)
+                })
+                .collect()
+        })
+        .unwrap_or_default();
+
+    if models.is_empty() {
+        models.push("claude-sonnet-5".to_string());
+    }
+
+    Ok(models)
+}
+
+pub async fn configure_houshiar_dialog(config: &Config) -> anyhow::Result<()> {
+    let current_key = config.get_secret::<String>("HOUSHIAR_API_KEY").ok();
+    let prompt = if current_key.is_some() {
+        "کلید API هوشیار (اینتر را برای حفظ کلید فعلی بزنید):"
+    } else {
+        "کلید API هوشیار (Houshiar API Key):"
+    };
+
+    let key: String = cliclack::password(prompt).mask('•').interact()?;
+
+    let final_key = if key.trim().is_empty() {
+        if let Some(existing) = current_key {
+            existing
+        } else {
+            cliclack::log::error("کلید API نامعتبر است")?;
+            anyhow::bail!("کلید API نامعتبر است");
+        }
+    } else {
+        key.trim().to_string()
+    };
+
+    let spinner = cliclack::spinner();
+    spinner.start("در حال اتصال به هوشیار...");
+
+    match validate_houshiar_key(&final_key).await {
+        Ok(models) => {
+            spinner.stop("اتصال با موفقیت انجام شد");
+            cliclack::log::success("اتصال با موفقیت انجام شد")?;
+            config.set_secret("HOUSHIAR_API_KEY", &final_key)?;
+            let default_model = if models.iter().any(|m| m == "claude-sonnet-5") {
+                "claude-sonnet-5".to_string()
+            } else {
+                models
+                    .first()
+                    .cloned()
+                    .unwrap_or_else(|| "claude-sonnet-5".to_string())
+            };
+            goose::config::set_active_provider(config, "houshiar", &default_model)?;
+            cliclack::log::info(format!("مدل پیش‌فرض: {default_model}"))?;
+            cliclack::outro("تنظیمات با موفقیت انجام شد!")?;
+            Ok(())
+        }
+        Err(e) => {
+            spinner.stop("کلید API نامعتبر است");
+            cliclack::log::error(format!("کلید API نامعتبر است: {e}"))?;
+            anyhow::bail!("کلید API نامعتبر است");
+        }
+    }
+}
+
+pub async fn configure_houshiar_model_dialog(config: &Config) -> anyhow::Result<()> {
+    let key = config
+        .get_secret::<String>("HOUSHIAR_API_KEY")
+        .or_else(|_| {
+            std::env::var("HOUSHIAR_API_KEY").map_err(|_| anyhow::anyhow!("No API key configured"))
+        })?;
+
+    let spinner = cliclack::spinner();
+    spinner.start("در حال دریافت مدل‌ها از هوشیار...");
+    let models = match validate_houshiar_key(&key).await {
+        Ok(models) => {
+            spinner.stop("مدل‌ها با موفقیت دریافت شدند");
+            models
+        }
+        Err(e) => {
+            spinner.stop("دریافت مدلها با خطا مواجه شد");
+            cliclack::log::error("دریافت مدلها با خطا مواجه شد")?;
+            anyhow::bail!("دریافت مدلها با خطا مواجه شد: {e}");
+        }
+    };
+
+    let mut select = cliclack::select("انتخاب مدل (Select model):");
+    for model in &models {
+        select = select.item(model.as_str(), model.as_str(), "");
+    }
+    let chosen_model = select.interact()?;
+    goose::config::set_active_provider(config, "houshiar", chosen_model)?;
+    cliclack::log::success(format!("مدل پیش‌فرض تنظیم شد به: {chosen_model}"))?;
+    cliclack::outro("Done!")?;
+    Ok(())
+}
+
 async fn handle_first_time_setup(config: &Config) -> anyhow::Result<()> {
     println!();
-    println!("{}", style("Welcome to goose! Let's get you set up.").dim());
+    println!(
+        "{}",
+        style("Welcome to Houshiar Code! Let's get you set up.").dim()
+    );
     println!(
         "{}",
         style("  you can rerun this command later to update your configuration").dim()
@@ -235,51 +369,9 @@ async fn handle_first_time_setup(config: &Config) -> anyhow::Result<()> {
     configure_telemetry_consent_dialog()?;
 
     println!();
-    cliclack::intro(style(" goose-configure ").on_cyan().black())?;
+    cliclack::intro(style(" houshiar-configure ").on_cyan().black())?;
 
-    let setup_method = cliclack::select("How would you like to set up your provider?")
-        .item(
-            "openrouter",
-            "OpenRouter Login (Recommended)",
-            "Sign in with OpenRouter to automatically configure models",
-        )
-        .item(
-            "tetrate",
-            "Tetrate Agent Router Service Login",
-            "Sign in with Tetrate Agent Router Service to automatically configure models",
-        )
-        .item(
-            "manual",
-            "Manual Configuration",
-            "Choose a provider and enter credentials manually",
-        )
-        .interact()?;
-
-    match setup_method {
-        "openrouter" => {
-            if let Err(e) = handle_openrouter_auth().await {
-                let _ = config.clear();
-                println!(
-                    "\n  {} OpenRouter authentication failed: {} \n  Please try again or use manual configuration",
-                    style("Error").red().italic(),
-                    e,
-                );
-            }
-        }
-        "tetrate" => {
-            if let Err(e) = handle_tetrate_auth().await {
-                let _ = config.clear();
-                println!(
-                    "\n  {} Tetrate Agent Router Service authentication failed: {} \n  Please try again or use manual configuration",
-                    style("Error").red().italic(),
-                    e,
-                );
-            }
-        }
-        "manual" => handle_manual_provider_setup(config).await,
-        _ => unreachable!(),
-    }
-    Ok(())
+    configure_houshiar_dialog(config).await
 }
 
 async fn handle_manual_provider_setup(config: &Config) {
@@ -403,18 +495,14 @@ async fn handle_existing_config() -> anyhow::Result<()> {
     );
     println!();
 
-    cliclack::intro(style(" goose-configure ").on_cyan().black())?;
+    cliclack::intro(style(" houshiar-configure ").on_cyan().black())?;
     let action = cliclack::select("What would you like to configure?")
         .item(
-            "providers",
-            "Configure Providers",
-            "Change provider or update credentials",
+            "houshiar",
+            "Houshiar API Key",
+            "Update your Houshiar API key",
         )
-        .item(
-            "custom_providers",
-            "Custom Providers",
-            "Add custom provider with compatible API",
-        )
+        .item("model", "Select Model", "Change default model")
         .item("add", "Add Extension", "Connect to a new extension")
         .item(
             "toggle",
@@ -424,18 +512,18 @@ async fn handle_existing_config() -> anyhow::Result<()> {
         .item("remove", "Remove Extension", "Remove an extension")
         .item(
             "settings",
-            "goose settings",
-            "Set the goose mode, Tool Output, Tool Permissions, Experiment, goose recipe github repo and more",
+            "Houshiar Code Settings",
+            "Set mode, Tool Output, Tool Permissions, and more",
         )
         .interact()?;
 
     match action {
+        "houshiar" => configure_houshiar_dialog(Config::global()).await,
+        "model" => configure_houshiar_model_dialog(Config::global()).await,
         "toggle" => toggle_extensions_dialog(),
         "add" => configure_extensions_dialog(),
         "remove" => remove_extension_dialog(),
         "settings" => configure_settings_dialog().await,
-        "providers" => configure_provider_dialog().await.map(|_| ()),
-        "custom_providers" => configure_custom_provider_dialog().await,
         _ => unreachable!(),
     }
 }

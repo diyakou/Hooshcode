@@ -129,6 +129,25 @@ describe('getLocale', () => {
     vi.stubGlobal('navigator', { languages: ['xx-XX'] });
     expect(getLocale()).toEqual({ locale: 'en', messageLocale: 'en' });
   });
+
+  it('supports Persian from navigator.languages', () => {
+    vi.stubGlobal('navigator', { languages: ['fa-IR'] });
+    expect(getLocale()).toEqual({ locale: 'fa-IR', messageLocale: 'fa' });
+  });
+
+  it('supports explicit Persian locale', () => {
+    mockAppConfig({ GOOSE_LOCALE: 'fa' });
+    vi.stubGlobal('navigator', { languages: ['en-US'] });
+    expect(getLocale()).toEqual({ locale: 'fa', messageLocale: 'fa' });
+  });
+
+  it('identifies RTL locales correctly', async () => {
+    const { isRtlLocale } = await import('./index');
+    expect(isRtlLocale('fa')).toBe(true);
+    expect(isRtlLocale('fa-IR')).toBe(true);
+    expect(isRtlLocale('en')).toBe(false);
+    expect(isRtlLocale('es')).toBe(false);
+  });
 });
 
 describe('loadMessages', () => {
@@ -136,6 +155,12 @@ describe('loadMessages', () => {
     const { loadMessages } = await import('./index');
     const messages = await loadMessages('en');
     expect(messages).toEqual({});
+  });
+
+  it('loads messages catalog for Persian locale', async () => {
+    const { loadMessages } = await import('./index');
+    const messages = await loadMessages('fa');
+    expect(Object.keys(messages).length).toBeGreaterThan(1000);
   });
 
   it('returns empty object for unsupported locale (with warning)', async () => {

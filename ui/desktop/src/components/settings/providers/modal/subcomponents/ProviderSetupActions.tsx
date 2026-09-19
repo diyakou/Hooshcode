@@ -7,8 +7,7 @@ import { defineMessages, useIntl } from '../../../../../i18n';
 const i18n = defineMessages({
   cannotDeleteActive: {
     id: 'providerSetupActions.cannotDeleteActive',
-    defaultMessage:
-      'You cannot delete {providerName} while it\'s currently in use. Please switch to a different model before deleting this provider.',
+    defaultMessage: 'You cannot delete {providerName} while it\'s currently in use. Please switch to a different model before deleting this provider.',
   },
   ok: {
     id: 'providerSetupActions.ok',
@@ -16,8 +15,7 @@ const i18n = defineMessages({
   },
   confirmDeleteMessage: {
     id: 'providerSetupActions.confirmDeleteMessage',
-    defaultMessage:
-      'Are you sure you want to delete the configuration parameters for {providerName}? This action cannot be undone.',
+    defaultMessage: 'Are you sure you want to delete the configuration parameters for {providerName}? This action cannot be undone.',
   },
   confirmDelete: {
     id: 'providerSetupActions.confirmDelete',

@@ -75,6 +75,18 @@ module.exports = {
   ],
   makers: [
     {
+      name: '@electron-forge/maker-squirrel',
+      platforms: ['win32'],
+      config: {
+        name: 'HoushiarCode',
+        authors: 'Houshiar',
+        description: 'Houshiar Code',
+        setupIcon: resolve(__dirname, 'src/images/icon.ico'),
+        setupExe: 'HoushiarCodeSetup.exe',
+        noMsi: true,
+      },
+    },
+    {
       name: '@electron-forge/maker-zip',
       platforms: ['darwin', 'win32', 'linux'],
       config: {

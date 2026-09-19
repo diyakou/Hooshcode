@@ -319,18 +319,30 @@ impl AnthropicProvider {
             });
         }
 
-        let arr = match json.get("data").and_then(|v| v.as_array()) {
+        let arr = json
+            .get("data")
+            .and_then(|v| v.as_array())
+            .or_else(|| json.get("models").and_then(|v| v.as_array()))
+            .or_else(|| json.as_array());
+
+        let arr = match arr {
             Some(arr) => arr,
             None => {
                 return Err(ProviderError::RequestFailed(
-                    "response is not a models payload (missing 'data' array)".into(),
+                    "response is not a models payload (missing 'data' or 'models' array)".into(),
                 ));
             }
         };
 
         let mut models: Vec<String> = arr
             .iter()
-            .filter_map(|m| m.get("id").and_then(|v| v.as_str()).map(str::to_string))
+            .filter_map(|m| {
+                m.get("id")
+                    .or_else(|| m.get("name"))
+                    .and_then(|v| v.as_str())
+                    .or_else(|| m.as_str())
+                    .map(str::to_string)
+            })
             .collect();
         models.sort();
         Ok(models)

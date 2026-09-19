@@ -929,10 +929,6 @@
   "dirSwitcher.enterPathInvalid": {
     "defaultMessage": "Working directory must be an absolute path"
   },
-
-
-
-
   "dirSwitcher.failedToUpdateWorkingDir": {
     "defaultMessage": "Gagal memperbarui direktori kerja"
   },
@@ -2172,9 +2168,6 @@
   "modelAndProviderContext.unknownProviderTitle": {
     "defaultMessage": "Pencarian nama penyedia"
   },
-  "modelSettingsButtons.configureProviders": {
-    "defaultMessage": "Konfigurasikan penyedia"
-  },
   "modelSettingsButtons.switchModels": {
     "defaultMessage": "Ganti model"
   },
@@ -2426,12 +2419,6 @@
   },
   "onboardingGuard.retry": {
     "defaultMessage": "Coba Lagi"
-  },
-  "onboardingGuard.welcomeDescription": {
-    "defaultMessage": "Agen AI lokal Anda. Hubungkan penyedia model AI untuk memulai."
-  },
-  "onboardingGuard.welcomeTitle": {
-    "defaultMessage": "Selamat datang di goose"
   },
   "onboardingSuccess.allSet": {
     "defaultMessage": "Anda siap untuk mulai menggunakan goose."
@@ -4772,5 +4759,8 @@
   },
   "settings.agentLoop.title": {
     "defaultMessage": "Loop agen"
+  },
+  "settings.language.persian": {
+    "defaultMessage": "Persian (فارسی)"
   }
 }

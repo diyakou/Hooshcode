@@ -2168,9 +2168,6 @@
   "modelAndProviderContext.unknownProviderTitle": {
     "defaultMessage": "Anbietername-Suche"
   },
-  "modelSettingsButtons.configureProviders": {
-    "defaultMessage": "Anbieter konfigurieren"
-  },
   "modelSettingsButtons.switchModels": {
     "defaultMessage": "Modelle wechseln"
   },
@@ -2422,12 +2419,6 @@
   },
   "onboardingGuard.retry": {
     "defaultMessage": "Erneut versuchen"
-  },
-  "onboardingGuard.welcomeDescription": {
-    "defaultMessage": "Ihr lokaler KI-Agent. Verbinden Sie einen KI-Modellanbieter, um zu beginnen."
-  },
-  "onboardingGuard.welcomeTitle": {
-    "defaultMessage": "Willkommen bei goose"
   },
   "onboardingSuccess.allSet": {
     "defaultMessage": "Sie können jetzt mit goose loslegen."
@@ -4768,5 +4759,8 @@
   },
   "settings.agentLoop.title": {
     "defaultMessage": "Agentenschleife"
+  },
+  "settings.language.persian": {
+    "defaultMessage": "Persian (فارسی)"
   }
 }

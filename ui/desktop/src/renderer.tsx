@@ -5,7 +5,7 @@ import { ConfigProvider } from './components/ConfigContext';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import SuspenseLoader from './suspense-loader';
 import { applyThemeTokens } from './theme/theme-tokens';
-import { currentLocale, currentMessageLocale, loadMessages } from './i18n';
+import { currentLocale, currentMessageLocale, loadMessages, isRtlLocale } from './i18n';
 
 // Apply theme tokens to :root before first paint.
 applyThemeTokens();
@@ -27,6 +27,17 @@ function handleIntlError(err: { code: string; message?: string }) {
 }
 
 (async () => {
+  const isRtl = isRtlLocale(currentMessageLocale);
+  if (typeof document !== 'undefined' && document.documentElement) {
+    document.documentElement.dir = isRtl ? 'rtl' : 'ltr';
+    document.documentElement.lang = currentLocale;
+    if (isRtl) {
+      document.documentElement.classList.add('rtl-layout');
+    } else {
+      document.documentElement.classList.remove('rtl-layout');
+    }
+  }
+
   const messages = await loadMessages(currentMessageLocale);
 
   ReactDOM.createRoot(document.getElementById('root')!).render(

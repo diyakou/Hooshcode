@@ -42,6 +42,7 @@ use crate::providers::base::ProviderType;
 use crate::providers::databricks_def::{self, DatabricksProviderDef};
 use crate::providers::databricks_v2_def::{self, DatabricksV2ProviderDef};
 use crate::providers::google_def::GoogleProviderDef;
+use crate::providers::houshiar_def::HoushiarProviderDef;
 use crate::providers::ollama_def::OllamaProviderDef;
 use crate::providers::openai_def::OpenAiProviderDef;
 use crate::providers::openrouter_def::OpenRouterProviderDef;
@@ -64,6 +65,10 @@ async fn init_registry() -> RwLock<ProviderRegistry> {
         registry.register_with_inventory::<AmpAcpProvider>(
             false,
             Some(registrations::amp_acp_inventory()),
+        );
+        registry.register_with_inventory::<HoushiarProviderDef>(
+            true,
+            Some(registrations::houshiar_inventory()),
         );
         registry.register_with_inventory::<AnthropicProviderDef>(
             true,
@@ -255,6 +260,7 @@ pub async fn get_from_registry(name: &str) -> Result<ProviderEntry> {
     guard
         .entries
         .get(name)
+        .or_else(|| guard.entries.get(&name.to_lowercase()))
         .ok_or_else(|| anyhow::anyhow!("Unknown provider: {}", name))
         .cloned()
 }

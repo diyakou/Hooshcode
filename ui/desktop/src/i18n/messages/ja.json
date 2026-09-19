@@ -929,10 +929,6 @@
   "dirSwitcher.enterPathInvalid": {
     "defaultMessage": "Working directory must be an absolute path"
   },
-
-
-
-
   "dirSwitcher.failedToUpdateWorkingDir": {
     "defaultMessage": "作業ディレクトリの更新に失敗しました"
   },
@@ -2172,9 +2168,6 @@
   "modelAndProviderContext.unknownProviderTitle": {
     "defaultMessage": "プロバイダー名の確認"
   },
-  "modelSettingsButtons.configureProviders": {
-    "defaultMessage": "プロバイダーを設定"
-  },
   "modelSettingsButtons.switchModels": {
     "defaultMessage": "モデルを切り替え"
   },
@@ -2426,12 +2419,6 @@
   },
   "onboardingGuard.retry": {
     "defaultMessage": "再試行"
-  },
-  "onboardingGuard.welcomeDescription": {
-    "defaultMessage": "ローカルAIエージェントです。始めるにはAIモデルプロバイダーに接続してください。"
-  },
-  "onboardingGuard.welcomeTitle": {
-    "defaultMessage": "gooseへようこそ"
   },
   "onboardingSuccess.allSet": {
     "defaultMessage": "gooseを使い始める準備ができました。"
@@ -4772,5 +4759,8 @@
   },
   "settings.agentLoop.title": {
     "defaultMessage": "エージェントループ"
+  },
+  "settings.language.persian": {
+    "defaultMessage": "Persian (فارسی)"
   }
 }

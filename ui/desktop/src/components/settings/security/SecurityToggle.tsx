@@ -71,8 +71,7 @@ const i18n = defineMessages({
   },
   warpNotice: {
     id: 'securityToggle.warpNotice',
-    defaultMessage:
-      'Command injection detection works best when connected to WARP (required to reach the classification service).',
+    defaultMessage: 'Command injection detection works best when connected to WARP (required to reach the classification service).',
   },
   commandEndpointDescription: {
     id: 'securityToggle.commandEndpointDescription',

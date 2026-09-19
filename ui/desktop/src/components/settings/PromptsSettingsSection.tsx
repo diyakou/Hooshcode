@@ -24,8 +24,7 @@ const i18n = defineMessages({
   },
   confirmResetAll: {
     id: 'promptsSettings.confirmResetAll',
-    defaultMessage:
-      'Are you sure you want to reset all prompts to their defaults? This cannot be undone.',
+    defaultMessage: 'Are you sure you want to reset all prompts to their defaults? This cannot be undone.',
   },
   allPromptsReset: {
     id: 'promptsSettings.allPromptsReset',
@@ -45,8 +44,7 @@ const i18n = defineMessages({
   },
   confirmResetOne: {
     id: 'promptsSettings.confirmResetOne',
-    defaultMessage:
-      'Are you sure you want to reset this prompt to its default? This cannot be undone.',
+    defaultMessage: 'Are you sure you want to reset this prompt to its default? This cannot be undone.',
   },
   promptResetToDefault: {
     id: 'promptsSettings.promptResetToDefault',
@@ -86,8 +84,7 @@ const i18n = defineMessages({
   },
   templateTip: {
     id: 'promptsSettings.templateTip',
-    defaultMessage:
-      'Template variables like {extensionsExample} or {forExample} are replaced with actual values at runtime. Be careful not to remove required variables.',
+    defaultMessage: 'Template variables like {extensionsExample} or {forExample} are replaced with actual values at runtime. Be careful not to remove required variables.',
   },
   editingLabel: {
     id: 'promptsSettings.editingLabel',
@@ -111,8 +108,7 @@ const i18n = defineMessages({
   },
   promptEditingDescription: {
     id: 'promptsSettings.promptEditingDescription',
-    defaultMessage:
-      "Customize the prompts that define goose's behavior in different contexts. These prompts use Jinja2 templating syntax. Be careful when modifying template variables, as incorrect changes can break functionality. Please share any improvements with the community.",
+    defaultMessage: "Customize the prompts that define Houshiar Code's behavior in different contexts. These prompts use Jinja2 templating syntax. Be careful when modifying template variables, as incorrect changes can break functionality. Please share any improvements with the community.",
   },
   resetAll: {
     id: 'promptsSettings.resetAll',

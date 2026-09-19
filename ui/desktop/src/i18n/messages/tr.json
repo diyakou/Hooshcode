@@ -929,10 +929,6 @@
   "dirSwitcher.enterPathInvalid": {
     "defaultMessage": "Working directory must be an absolute path"
   },
-
-
-
-
   "dirSwitcher.failedToUpdateWorkingDir": {
     "defaultMessage": "Çalışma dizini güncellenemedi"
   },
@@ -2172,9 +2168,6 @@
   "modelAndProviderContext.unknownProviderTitle": {
     "defaultMessage": "Sağlayıcı adı araması"
   },
-  "modelSettingsButtons.configureProviders": {
-    "defaultMessage": "Sağlayıcıları yapılandırma"
-  },
   "modelSettingsButtons.switchModels": {
     "defaultMessage": "Modelleri değiştir"
   },
@@ -2426,12 +2419,6 @@
   },
   "onboardingGuard.retry": {
     "defaultMessage": "Yeniden dene"
-  },
-  "onboardingGuard.welcomeDescription": {
-    "defaultMessage": "Yerel AI temsilciniz. Başlamak için bir AI model sağlayıcısına bağlanın."
-  },
-  "onboardingGuard.welcomeTitle": {
-    "defaultMessage": "goose'a hoş geldiniz"
   },
   "onboardingSuccess.allSet": {
     "defaultMessage": "goose'yi kullanmaya başlamaya hazırsınız."
@@ -4772,5 +4759,8 @@
   },
   "settings.agentLoop.title": {
     "defaultMessage": "Ajan döngüsü"
+  },
+  "settings.language.persian": {
+    "defaultMessage": "Persian (فارسی)"
   }
 }

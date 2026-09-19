@@ -14,8 +14,7 @@ const i18n = defineMessages({
   },
   description: {
     id: 'externalBackendSection.description',
-    defaultMessage:
-      'By default Goose starts a local backend. Use this to connect to an external ACP-compatible backend.',
+    defaultMessage: 'By default Houshiar Code starts a local backend. Use this to connect to an external ACP-compatible backend.',
   },
   useExternalServer: {
     id: 'externalBackendSection.useExternalServer',
@@ -31,8 +30,7 @@ const i18n = defineMessages({
   },
   serverUrlHelp: {
     id: 'externalBackendSection.serverUrlHelp',
-    defaultMessage:
-      'Enter the HTTP(S) base URL. Goose checks /status and connects to /acp under this base.',
+    defaultMessage: 'Enter the HTTP(S) base URL. Houshiar Code checks /status and connects to /acp under this base.',
   },
   workingDir: {
     id: 'externalBackendSection.workingDir',
@@ -40,12 +38,11 @@ const i18n = defineMessages({
   },
   workingDirPlaceholder: {
     id: 'externalBackendSection.workingDirPlaceholder',
-    defaultMessage: '/home/goose/workspace',
+    defaultMessage: '/home/houshiar/workspace',
   },
   workingDirHelp: {
     id: 'externalBackendSection.workingDirHelp',
-    defaultMessage:
-      'Absolute path on the external backend. Leave blank to send the local working directory.',
+    defaultMessage: 'Absolute path on the external backend. Leave blank to send the local working directory.',
   },
   secretKey: {
     id: 'externalBackendSection.secretKey',
@@ -69,12 +66,11 @@ const i18n = defineMessages({
   },
   certFingerprintHelp: {
     id: 'externalBackendSection.certFingerprintHelp',
-    defaultMessage:
-      'Pin a specific TLS certificate fingerprint. If omitted, the certificate is trusted on first use (TOFU).',
+    defaultMessage: 'Pin a specific TLS certificate fingerprint. If omitted, the certificate is trusted on first use (TOFU).',
   },
   restartNote: {
     id: 'externalBackendSection.restartNote',
-    defaultMessage: 'Changes apply to new chat windows. Restart Goose to update existing windows.',
+    defaultMessage: 'Changes apply to new chat windows. Restart Houshiar Code to update existing windows.',
   },
   urlProtocolError: {
     id: 'externalBackendSection.urlProtocolError',
@@ -90,8 +86,7 @@ const i18n = defineMessages({
   },
   urlBaseError: {
     id: 'externalBackendSection.urlBaseError',
-    defaultMessage:
-      'URL must be the backend base URL before /acp, without query parameters or fragments',
+    defaultMessage: 'URL must be the backend base URL before /acp, without query parameters or fragments',
   },
 });
 

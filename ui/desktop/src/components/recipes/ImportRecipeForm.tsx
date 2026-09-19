@@ -23,7 +23,7 @@ const i18n = defineMessages({
   },
   deeplinkPlaceholder: {
     id: 'importRecipeForm.deeplinkPlaceholder',
-    defaultMessage: 'Paste your goose://recipe?config=... deeplink here',
+    defaultMessage: 'Paste your Houshiar Code://recipe?config=... deeplink here',
   },
   deeplinkHint: {
     id: 'importRecipeForm.deeplinkHint',
@@ -47,7 +47,7 @@ const i18n = defineMessages({
   },
   reviewWarning: {
     id: 'importRecipeForm.reviewWarning',
-    defaultMessage: 'Ensure you review contents of recipe files before adding them to your goose interface.',
+    defaultMessage: 'Ensure you review contents of recipe files before adding them to your Houshiar Code interface.',
   },
   cancel: {
     id: 'importRecipeForm.cancel',

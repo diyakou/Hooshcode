@@ -989,3 +989,29 @@ pre:has(> code.bg-inline-code) {
   background-color: #393647;
   color: #edecee;
 }
+
+/* ═══════════════════════════════════════════════════════════
+   PERSIAN (FA) & RTL STYLING
+   ═══════════════════════════════════════════════════════════ */
+:root[dir='rtl'],
+.rtl-layout {
+  direction: rtl;
+  font-family: -apple-system, BlinkMacSystemFont, 'Vazirmatn', 'Sahel', 'Segoe UI', Tahoma, Arial, sans-serif;
+}
+
+[dir='rtl'] [dir='ltr'] {
+  direction: ltr;
+}
+
+[dir='rtl'] input,
+[dir='rtl'] textarea {
+  text-align: right;
+}
+
+[dir='rtl'] input[dir='ltr'],
+[dir='rtl'] textarea[dir='ltr'],
+[dir='rtl'] input[type='password'],
+[dir='rtl'] code,
+[dir='rtl'] pre {
+  text-align: left;
+}

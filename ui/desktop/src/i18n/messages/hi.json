@@ -929,10 +929,6 @@
   "dirSwitcher.enterPathInvalid": {
     "defaultMessage": "Working directory must be an absolute path"
   },
-
-
-
-
   "dirSwitcher.failedToUpdateWorkingDir": {
     "defaultMessage": "कार्यशील निर्देशिका अद्यतन करने में विफल"
   },
@@ -2172,9 +2168,6 @@
   "modelAndProviderContext.unknownProviderTitle": {
     "defaultMessage": "प्रदाता का नाम लुकअप"
   },
-  "modelSettingsButtons.configureProviders": {
-    "defaultMessage": "प्रदाताओं को कॉन्फ़िगर करें"
-  },
   "modelSettingsButtons.switchModels": {
     "defaultMessage": "मॉडल स्विच करें"
   },
@@ -2426,12 +2419,6 @@
   },
   "onboardingGuard.retry": {
     "defaultMessage": "पुनः प्रयास करें"
-  },
-  "onboardingGuard.welcomeDescription": {
-    "defaultMessage": "आपका स्थानीय एआई एजेंट। आरंभ करने के लिए किसी AI मॉडल प्रदाता से कनेक्ट करें।"
-  },
-  "onboardingGuard.welcomeTitle": {
-    "defaultMessage": "goose में आपका स्वागत है"
   },
   "onboardingSuccess.allSet": {
     "defaultMessage": "आप goose का उपयोग शुरू करने के लिए पूरी तरह तैयार हैं।"
@@ -4772,5 +4759,8 @@
   },
   "settings.agentLoop.title": {
     "defaultMessage": "एजेंट लूप"
+  },
+  "settings.language.persian": {
+    "defaultMessage": "Persian (فارسی)"
   }
 }

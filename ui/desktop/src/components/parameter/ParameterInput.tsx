@@ -6,8 +6,7 @@ import { defineMessages, useIntl } from '../../i18n';
 const i18n = defineMessages({
   unusedWarningTitle: {
     id: 'parameterInput.unusedWarningTitle',
-    defaultMessage:
-      'This parameter is not used in the instructions or prompt. It will be available for manual input but may not be needed.',
+    defaultMessage: 'This parameter is not used in the instructions or prompt. It will be available for manual input but may not be needed.',
   },
   unused: {
     id: 'parameterInput.unused',

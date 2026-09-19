@@ -14,6 +14,7 @@ use goose::session::session_manager::SessionType;
 use goose::session::EnabledExtensionsState;
 use rustyline::EditMode;
 use std::collections::{HashMap, HashSet};
+use std::io::IsTerminal;
 use std::process;
 use std::sync::Arc;
 use tokio_util::task::AbortOnDropHandle;
@@ -294,22 +295,29 @@ async fn resolve_provider_and_model(
     saved_provider: Option<String>,
     saved_model_config: Option<goose_providers::model::ModelConfig>,
 ) -> ResolvedProviderConfig {
+    if config.get_secret::<String>("HOUSHIAR_API_KEY").is_err()
+        && std::env::var("HOUSHIAR_API_KEY").is_err()
+    {
+        if std::io::stdin().is_terminal() {
+            println!();
+            let _ = cliclack::intro(console::style(" Houshiar Code Setup ").on_cyan().black());
+            if let Err(e) = crate::commands::configure::configure_houshiar_dialog(config).await {
+                output::render_error(&format!("Setup failed: {e}"));
+                process::exit(1);
+            }
+        } else {
+            output::render_error("Houshiar API key not found. Please set HOUSHIAR_API_KEY environment variable or run 'houshiar configure'.");
+            process::exit(1);
+        }
+    }
+
     let recipe_settings = session_config
         .recipe
         .as_ref()
         .and_then(|r| r.settings.as_ref());
     let configured_provider = config.get_goose_provider().ok();
 
-    let provider_name = session_config
-        .provider
-        .clone()
-        .or_else(|| saved_provider.clone())
-        .or_else(|| recipe_settings.and_then(|s| s.goose_provider.clone()))
-        .or_else(|| configured_provider.clone())
-        .unwrap_or_else(|| {
-            output::render_error("No provider configured. Run 'goose configure' first.");
-            process::exit(1);
-        });
+    let provider_name = "houshiar".to_string();
 
     let saved_provider_matches = saved_provider.as_deref() == Some(provider_name.as_str());
     let provider_overridden = session_config.provider.is_some();
@@ -401,10 +409,7 @@ async fn resolve_provider_and_model(
                 config.get_goose_model().ok()
             }
         })
-        .unwrap_or_else(|| {
-            output::render_error("No model configured. Run 'goose configure' first.");
-            process::exit(1);
-        });
+        .unwrap_or_else(|| "claude-sonnet-5".to_string());
 
     let mut model_config = if session_config.resume
         && saved_provider_matches

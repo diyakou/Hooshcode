@@ -1,5 +1,9 @@
 import { listLocalModels } from '../../../acp/local-inference';
-import { acpGetProviderDetails, acpListProviderModels } from '../../../acp/providers';
+import {
+  acpGetProviderDetails,
+  acpListProviderModels,
+  acpListProviderSupportedModels,
+} from '../../../acp/providers';
 import type { ProviderDetails, ThinkingEffort } from '../../../types/providers';
 import { errorMessage as getErrorMessage } from '../../../utils/conversionUtils';
 
@@ -38,6 +42,41 @@ export async function fetchModelsForProviders(
           .filter((m) => m.status.state === 'Downloaded')
           .map((m) => ({ name: m.id, provider: p.name }) as Model);
         return { provider: p, models: downloadedModels, error: null, warning: null };
+      }
+
+      // For Houshiar provider, fetch supported models live from backend
+      if (p.name.toLowerCase().includes('houshiar')) {
+        try {
+          const supported = await acpListProviderSupportedModels(p.name);
+          if (supported && supported.length > 0) {
+            const models = supported.map(
+              (name) =>
+                ({
+                  name,
+                  provider: p.name,
+                  context_limit: 200000,
+                }) as Model
+            );
+            return { provider: p, models, error: null, warning: null };
+          }
+        } catch (supportedErr) {
+          console.warn(`Live supported models fetch failed for ${p.name}:`, supportedErr);
+        }
+
+        try {
+          const stored = await window.electron.getSetting('houshiar_models');
+          if (Array.isArray(stored) && stored.length > 0) {
+            const models = (stored as string[]).map(
+              (name) =>
+                ({
+                  name,
+                  provider: p.name,
+                  context_limit: 200000,
+                }) as Model
+            );
+            return { provider: p, models, error: null, warning: null };
+          }
+        } catch {}
       }
 
       const providerModels = await acpListProviderModels(p.name);
