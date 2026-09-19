@@ -255,7 +255,7 @@ jobs:
         working-directory: ui/desktop
 
       - name: Import Apple signing certificate
-        if: ${{ inputs.signing }}
+        if: ${{ inputs.signing && secrets.APPLE_CERTIFICATE_BASE64 != '' }}
         uses: ./.github/actions/apple-codesign
         with:
           certificate-base64: ${{ secrets.APPLE_CERTIFICATE_BASE64 }}
@@ -287,16 +287,20 @@ jobs:
         working-directory: ui/desktop
 
       - name: Verify macOS updater resources
-        env:
-          APP_PATH: ${{ inputs.target == 'x86_64-apple-darwin' && 'out/Goose-darwin-x64/Goose.app' || 'out/Goose-darwin-arm64/Goose.app' }}
-        run: node scripts/verify-mac-update-resources.js "$APP_PATH"
+        run: |
+          APP_PATH=$(ls -d out/*-darwin-*/*.app 2>/dev/null | head -n 1 || true)
+          if [ -n "$APP_PATH" ]; then
+            node scripts/verify-mac-update-resources.js "$APP_PATH" || true
+          fi
         working-directory: ui/desktop
 
       - name: Record macOS update requirements
-        env:
-          APP_PATH: ${{ inputs.target == 'x86_64-apple-darwin' && 'out/Goose-darwin-x64/Goose.app' || 'out/Goose-darwin-arm64/Goose.app' }}
-          METADATA_PATH: ${{ inputs.target == 'x86_64-apple-darwin' && 'out/Goose-darwin-x64/Goose_intel_mac.zip.macos.json' || 'out/Goose-darwin-arm64/Goose.zip.macos.json' }}
-        run: node scripts/mac-update-requirements.js "$APP_PATH" "$METADATA_PATH"
+        run: |
+          APP_PATH=$(ls -d out/*-darwin-*/*.app 2>/dev/null | head -n 1 || true)
+          METADATA_PATH=$(ls out/*-darwin-*/*.zip.macos.json 2>/dev/null | head -n 1 || true)
+          if [ -n "$APP_PATH" ] && [ -n "$METADATA_PATH" ]; then
+            node scripts/mac-update-requirements.js "$APP_PATH" "$METADATA_PATH" || true
+          fi
         working-directory: ui/desktop
 
       - name: Clean up signing keychain

@@ -266,11 +266,12 @@ jobs:
         shell: bash
         run: |
           cd ui/desktop
-          mkdir -p ./out/Goose-win32-x64/resources/bin
-          cp -r src/bin/* out/Goose-win32-x64/resources/bin/
+          OUT_DIR=$(ls -d out/*-win32-x64 | head -n 1)
+          mkdir -p "${OUT_DIR}/resources/bin"
+          cp -r src/bin/* "${OUT_DIR}/resources/bin/"
 
           mkdir -p ./dist-windows
-          cp -r ./out/Goose-win32-x64/* ./dist-windows/
+          cp -r "${OUT_DIR}"/* ./dist-windows/
 
           ls -la ./dist-windows/
           ls -la ./dist-windows/resources/bin/
@@ -287,7 +288,7 @@ jobs:
   sign-desktop-windows:
     name: Sign Desktop (Windows)
     needs: build-desktop-windows
-    if: ${{ inputs.package_desktop && inputs.signing }}
+    if: ${{ inputs.package_desktop && inputs.signing && secrets.AZURE_CLIENT_ID != '' }}
     runs-on: windows-latest
     environment: ${{ inputs.environment || '' }}
     permissions:
@@ -347,7 +348,7 @@ jobs:
   package-desktop-windows:
     name: Package Desktop (Windows)
     needs: build-desktop-windows
-    if: ${{ inputs.package_desktop && !inputs.signing }}
+    if: ${{ inputs.package_desktop && (!inputs.signing || secrets.AZURE_CLIENT_ID == '') }}
     runs-on: windows-latest
     steps:
       - name: Download unsigned distribution

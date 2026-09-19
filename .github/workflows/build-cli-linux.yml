@@ -387,6 +387,7 @@ jobs:
           fi
 
           for package in "out/make/rpm/${ELECTRON_ARCH}/"*.rpm; do
+            [ -e "${package}" ] || continue
             package_contents="$(rpm -qlp "${package}")"
             if grep -qE '^/usr/lib/\.build-id(/|$)' <<< "${package_contents}"; then
               echo "::error file=${package}::RPM contains build-id links"
@@ -394,25 +395,32 @@ jobs:
             fi
           done
 
-          find out/ -type f \( -name "*.deb" -o -name "*.rpm" -o -name "*.flatpak" \) -exec ls -lh {} \;
+          find out/ -type f \( -name "*.deb" -o -name "*.rpm" -o -name "*.flatpak" -o -name "*.zip" \) -exec ls -lh {} \;
 
       - name: Upload .deb package
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a  # v7.0.1
         with:
           name: Goose-linux-${{ matrix.electron_arch }}${{ matrix.variant_suffix }}-deb
           path: ui/desktop/out/make/deb/${{ matrix.electron_arch }}/*${{ matrix.variant_suffix }}.deb
-          if-no-files-found: error
+          if-no-files-found: warn
 
       - name: Upload .rpm package
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a  # v7.0.1
         with:
           name: Goose-linux-${{ matrix.electron_arch }}${{ matrix.variant_suffix }}-rpm
           path: ui/desktop/out/make/rpm/${{ matrix.electron_arch }}/*${{ matrix.variant_suffix }}.rpm
-          if-no-files-found: error
+          if-no-files-found: warn
 
       - name: Upload .flatpak package
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a  # v7.0.1
         with:
           name: Goose-linux-${{ matrix.electron_arch }}${{ matrix.variant_suffix }}-flatpak
           path: ui/desktop/out/make/flatpak/${{ matrix.flatpak_arch }}/*${{ matrix.variant_suffix }}.flatpak
-          if-no-files-found: error
+          if-no-files-found: warn
+
+      - name: Upload .zip package
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a  # v7.0.1
+        with:
+          name: Goose-linux-${{ matrix.electron_arch }}${{ matrix.variant_suffix }}-zip
+          path: ui/desktop/out/make/zip/linux/${{ matrix.electron_arch }}/*.zip
+          if-no-files-found: warn

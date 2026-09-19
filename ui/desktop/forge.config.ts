@@ -99,10 +99,10 @@ module.exports = {
     {
       name: '@electron-forge/maker-deb',
       config: {
-        name: 'Goose',
-        bin: 'Goose',
-        maintainer: 'AAIF (Agentic AI Foundation)',
-        homepage: 'https://goose-docs.ai/',
+        name: 'houshiar-code',
+        bin: 'goose',
+        maintainer: 'Houshiar',
+        homepage: 'https://houshiar-ai.ir',
         categories: ['Development'],
         desktopTemplate: './forge.deb.desktop',
         options: {
@@ -115,70 +115,16 @@ module.exports = {
     {
       name: '@electron-forge/maker-rpm',
       config: {
-        name: 'Goose',
-        bin: 'Goose',
-        maintainer: 'AAIF (Agentic AI Foundation)',
-        homepage: 'https://goose-docs.ai/',
+        name: 'houshiar-code',
+        bin: 'goose',
+        maintainer: 'Houshiar',
+        homepage: 'https://houshiar-ai.ir',
         categories: ['Development'],
         desktopTemplate: './forge.rpm.desktop',
         options: {
           icon: 'src/images/icon.png',
           prefix: '/opt',
           ...(isLinuxVulkanBuild ? { requires: ['vulkan-loader'] } : {}),
-        },
-      },
-    },
-    {
-      name: '@electron-forge/maker-flatpak',
-      config: {
-        options: {
-          id: 'io.github.block.Goose', // NOTE: kept for backwards compat with existing installs
-          categories: ['Development'],
-          mimeType: ['x-scheme-handler/goose'],
-          icon: {
-            scalable: 'src/images/icon.svg',
-            '512x512': 'src/images/icon-512.png',
-          },
-          homepage: 'https://goose-docs.ai/',
-          runtimeVersion: '25.08',
-          baseVersion: '25.08',
-          bin: 'Goose',
-          modules: [
-            {
-              name: 'libbz2-shim',
-              buildsystem: 'simple',
-              'build-commands': [
-                // Create the lib directory in the app bundle
-                'mkdir -p /app/lib',
-                // Point to the actual library in the 25.08 runtime
-                // We use a wildcard to handle multi-arch paths (x86_64-linux-gnu, etc)
-                'ln -s $(find /usr/lib -name "libbz2.so.1" | head -n 1) /app/lib/libbz2.so.1.0',
-              ],
-            },
-            {
-              name: 'git',
-              buildsystem: 'simple',
-              'build-commands': [
-                'mkdir -p /app/bin /app/libexec/git-core',
-                'cp /usr/bin/git /app/bin/git',
-                'cp /usr/libexec/git-core/git-remote-https /app/libexec/git-core/git-remote-https 2>/dev/null || true',
-              ],
-            },
-          ],
-          finishArgs: [
-            '--share=ipc',
-            '--socket=x11',
-            '--socket=wayland',
-            '--device=dri',
-            '--share=network',
-            '--filesystem=home',
-            '--talk-name=org.freedesktop.Notifications',
-            '--socket=session-bus',
-            '--socket=system-bus',
-            // This ensures the app looks in our shim folder first
-            '--env=LD_LIBRARY_PATH=/app/lib',
-            '--env=GIT_EXEC_PATH=/app/libexec/git-core',
-          ],
         },
       },
     },
