@@ -24,9 +24,9 @@ use std::sync::{
 
 mod docx_tool;
 mod pdf_tool;
-mod xlsx_tool;
 #[cfg(target_os = "windows")]
 mod windows;
+mod xlsx_tool;
 
 /// Parameters for the computer_control tool (macOS Peekaboo / Windows Native GUI automation)
 #[cfg(any(target_os = "macos", target_os = "windows"))]

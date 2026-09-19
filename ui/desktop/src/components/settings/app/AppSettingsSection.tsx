@@ -41,7 +41,8 @@ const i18n = defineMessages({
   },
   taskNotificationsDesc: {
     id: 'settings.notifications.task.description',
-    defaultMessage: 'Notify when Houshiar Code finishes a task while the window is in the background',
+    defaultMessage:
+      'Notify when Houshiar Code finishes a task while the window is in the background',
   },
   menuBarIcon: { id: 'settings.menuBarIcon.title', defaultMessage: 'Menu bar icon' },
   menuBarIconDesc: {
@@ -49,11 +50,15 @@ const i18n = defineMessages({
     defaultMessage: 'Show Houshiar Code in the menu bar',
   },
   dockIcon: { id: 'settings.dockIcon.title', defaultMessage: 'Dock icon' },
-  dockIconDesc: { id: 'settings.dockIcon.description', defaultMessage: 'Show Houshiar Code in the dock' },
+  dockIconDesc: {
+    id: 'settings.dockIcon.description',
+    defaultMessage: 'Show Houshiar Code in the dock',
+  },
   preventSleep: { id: 'settings.preventSleep.title', defaultMessage: 'Prevent Sleep' },
   preventSleepDesc: {
     id: 'settings.preventSleep.description',
-    defaultMessage: 'Keep your computer awake while Houshiar Code is running a task (screen can still lock)',
+    defaultMessage:
+      'Keep your computer awake while Houshiar Code is running a task (screen can still lock)',
   },
   costTracking: { id: 'settings.costTracking.title', defaultMessage: 'Cost Tracking' },
   costTrackingDesc: {

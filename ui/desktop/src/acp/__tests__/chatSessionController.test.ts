@@ -266,7 +266,6 @@ describe('acpChatSessionController.submitMessage', () => {
     expect(acpChatSessionActions.startPromptAttempt).not.toHaveBeenCalled();
     expect(acpPromptSession).not.toHaveBeenCalled();
   });
-
 });
 
 describe('acpChatSessionController.updateMessage', () => {

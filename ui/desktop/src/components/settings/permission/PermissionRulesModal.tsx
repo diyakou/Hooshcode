@@ -13,7 +13,8 @@ const i18n = defineMessages({
   },
   description: {
     id: 'permissionRulesModal.description',
-    defaultMessage: 'Configure tool permissions for extensions to control how they interact with your system.',
+    defaultMessage:
+      'Configure tool permissions for extensions to control how they interact with your system.',
   },
   extensionRules: {
     id: 'permissionRulesModal.extensionRules',
@@ -126,9 +127,7 @@ export default function PermissionRulesModal({ isOpen, onClose }: PermissionRule
               <DialogTitle className="text-3xl font-medium text-text-primary">
                 {intl.formatMessage(i18n.title)}
               </DialogTitle>
-              <p className="text-text-secondary">
-                {intl.formatMessage(i18n.description)}
-              </p>
+              <p className="text-text-secondary">{intl.formatMessage(i18n.description)}</p>
             </div>
           </div>
         </DialogHeader>

@@ -38,7 +38,11 @@ pub async fn run_powershell_script(script: &str) -> Result<String, ErrorData> {
     // Filter out CLIXML progress lines if any
     let cleaned_stdout: String = stdout
         .lines()
-        .filter(|line| !line.starts_with("#< CLIXML") && !line.starts_with("<Objs") && !line.starts_with("<Obj "))
+        .filter(|line| {
+            !line.starts_with("#< CLIXML")
+                && !line.starts_with("<Objs")
+                && !line.starts_with("<Obj ")
+        })
         .collect::<Vec<_>>()
         .join("\n");
 
@@ -145,7 +149,13 @@ Write-Output "Screen captured ($($bounds.Width)x$($bounds.Height))"
                 let is_middle = args.iter().any(|a| a == "--middle");
 
                 let (x_part, y_part) = match coords {
-                    Some((x, y)) => (format!("[WinMouse]::SetCursorPos({}, {}); Start-Sleep -Milliseconds 50;", x, y), format!(" at ({}, {})", x, y)),
+                    Some((x, y)) => (
+                        format!(
+                            "[WinMouse]::SetCursorPos({}, {}); Start-Sleep -Milliseconds 50;",
+                            x, y
+                        ),
+                        format!(" at ({}, {})", x, y),
+                    ),
                     None => (String::new(), " at current position".to_string()),
                 };
 
@@ -363,7 +373,13 @@ Write-Output "Pressed {key_name} {count} time(s)"
 
             "hotkey" => {
                 let keys_str = parse_flag_value(&args, "--keys")
-                    .or_else(|| if args.len() > 1 && !args[1].starts_with("--") { Some(args[1].clone()) } else { None })
+                    .or_else(|| {
+                        if args.len() > 1 && !args[1].starts_with("--") {
+                            Some(args[1].clone())
+                        } else {
+                            None
+                        }
+                    })
                     .unwrap_or_default();
 
                 let send_keys_format = format_hotkey_for_sendkeys(&keys_str);
@@ -380,7 +396,11 @@ Write-Output "Sent hotkey: {keys_str} ({send_keys_format})"
             }
 
             "app" | "window" => {
-                let sub = if args.len() > 1 { args[1].to_lowercase() } else { "list".to_string() };
+                let sub = if args.len() > 1 {
+                    args[1].to_lowercase()
+                } else {
+                    "list".to_string()
+                };
                 if sub == "switch" || sub == "focus" || sub == "launch" {
                     let target_name = if args.len() > 2 {
                         args[2..].join(" ")

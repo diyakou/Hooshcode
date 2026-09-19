@@ -83,7 +83,8 @@ const i18n = defineMessages({
   importNostrTitle: { id: 'sessions.importNostr.title', defaultMessage: 'Import Nostr Session' },
   importNostrDesc: {
     id: 'sessions.importNostr.description',
-    defaultMessage: 'Paste a Houshiar Code Nostr share link to fetch, decrypt, and import the session.',
+    defaultMessage:
+      'Paste a Houshiar Code Nostr share link to fetch, decrypt, and import the session.',
   },
   importNostrPlaceholder: {
     id: 'sessions.importNostr.placeholder',
@@ -92,7 +93,8 @@ const i18n = defineMessages({
   importing: { id: 'sessions.importing', defaultMessage: 'Importing...' },
   chatHistoryDesc: {
     id: 'sessions.chatHistoryDesc',
-    defaultMessage: 'View and search your past conversations with Houshiar Code. {shortcut} to search.',
+    defaultMessage:
+      'View and search your past conversations with Houshiar Code. {shortcut} to search.',
   },
   searchPlaceholder: { id: 'sessions.searchPlaceholder', defaultMessage: 'Search history...' },
   errorLoading: { id: 'sessions.error.loading', defaultMessage: 'Error Loading Sessions' },
@@ -111,7 +113,8 @@ const i18n = defineMessages({
   deleteTitle: { id: 'sessions.delete.title', defaultMessage: 'Delete Session' },
   deleteMessage: {
     id: 'sessions.delete.message',
-    defaultMessage: 'Are you sure you want to delete the session "{name}"? This action cannot be undone.',
+    defaultMessage:
+      'Are you sure you want to delete the session "{name}"? This action cannot be undone.',
   },
   duplicateSuccess: {
     id: 'sessions.toast.duplicated',
@@ -162,7 +165,8 @@ const i18n = defineMessages({
   },
   shareNostrDesc: {
     id: 'sessions.shareNostr.description',
-    defaultMessage: 'Anyone with this link can fetch and decrypt the session. Treat it like a secret.',
+    defaultMessage:
+      'Anyone with this link can fetch and decrypt the session. Treat it like a secret.',
   },
   close: { id: 'sessions.close', defaultMessage: 'Close' },
   scheduledJobs: {
@@ -1043,54 +1047,56 @@ const SessionListView: React.FC<SessionListViewProps> = React.memo(({ onSelectSe
           visibleGroupsCount >= activeDateGroups.length &&
           memoizedScheduledDateGroups.length > 0 && (
             <div className="space-y-4">
-            <button
-              onClick={() => setIsScheduledExpanded((v) => !v)}
-              aria-expanded={isScheduledExpanded}
-              aria-controls="scheduled-job-sessions"
-              className="sticky top-0 z-10 w-full flex items-center justify-between bg-background-primary/95 backdrop-blur-sm py-2 px-1 rounded-lg hover:bg-background-secondary transition-colors cursor-pointer"
-            >
-              <div className="flex items-center gap-2">
-                <Clock className="w-4 h-4 text-text-secondary" />
-                <h2 className="text-text-secondary font-medium">
-                  {intl.formatMessage(i18n.scheduledJobs)}
-                </h2>
-                <span className="text-xs text-text-tertiary bg-background-secondary px-2 py-0.5 rounded-full">
-                  {intl.formatMessage(i18n.scheduledJobsCount, { count: scheduledSessions.length })}
-                </span>
-              </div>
-              {isScheduledExpanded ? (
-                <ChevronDown className="w-4 h-4 text-text-secondary" />
-              ) : (
-                <ChevronRight className="w-4 h-4 text-text-secondary" />
-              )}
-            </button>
+              <button
+                onClick={() => setIsScheduledExpanded((v) => !v)}
+                aria-expanded={isScheduledExpanded}
+                aria-controls="scheduled-job-sessions"
+                className="sticky top-0 z-10 w-full flex items-center justify-between bg-background-primary/95 backdrop-blur-sm py-2 px-1 rounded-lg hover:bg-background-secondary transition-colors cursor-pointer"
+              >
+                <div className="flex items-center gap-2">
+                  <Clock className="w-4 h-4 text-text-secondary" />
+                  <h2 className="text-text-secondary font-medium">
+                    {intl.formatMessage(i18n.scheduledJobs)}
+                  </h2>
+                  <span className="text-xs text-text-tertiary bg-background-secondary px-2 py-0.5 rounded-full">
+                    {intl.formatMessage(i18n.scheduledJobsCount, {
+                      count: scheduledSessions.length,
+                    })}
+                  </span>
+                </div>
+                {isScheduledExpanded ? (
+                  <ChevronDown className="w-4 h-4 text-text-secondary" />
+                ) : (
+                  <ChevronRight className="w-4 h-4 text-text-secondary" />
+                )}
+              </button>
 
-            {isScheduledExpanded && (
-              <div id="scheduled-job-sessions" className="space-y-8">
-                {memoizedScheduledDateGroups.map((group) => (
-                  <div key={group.label} className="space-y-4">
-                    <div className="sticky top-0 z-10 bg-background-primary/95 backdrop-blur-sm">
-                      <h2 className="text-text-secondary">{group.label}</h2>
+              {isScheduledExpanded && (
+                <div id="scheduled-job-sessions" className="space-y-8">
+                  {memoizedScheduledDateGroups.map((group) => (
+                    <div key={group.label} className="space-y-4">
+                      <div className="sticky top-0 z-10 bg-background-primary/95 backdrop-blur-sm">
+                        <h2 className="text-text-secondary">{group.label}</h2>
+                      </div>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4">
+                        {group.sessions.map((session) => (
+                          <SessionItem
+                            key={session.id}
+                            session={session}
+                            onEditClick={handleEditSession}
+                            onDuplicateClick={handleDuplicateSession}
+                            onDeleteClick={handleDeleteSession}
+                            onExportClick={handleExportSession}
+                            onShareClick={handleShareSessionNostr}
+                            onOpenInNewWindow={handleOpenInNewWindow}
+                            isSharing={sharingSessionId === session.id}
+                          />
+                        ))}
+                      </div>
                     </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4">
-                      {group.sessions.map((session) => (
-                        <SessionItem
-                          key={session.id}
-                          session={session}
-                          onEditClick={handleEditSession}
-                          onDuplicateClick={handleDuplicateSession}
-                          onDeleteClick={handleDeleteSession}
-                          onExportClick={handleExportSession}
-                          onShareClick={handleShareSessionNostr}
-                          onOpenInNewWindow={handleOpenInNewWindow}
-                          isSharing={sharingSessionId === session.id}
-                        />
-                      ))}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
+                  ))}
+                </div>
+              )}
             </div>
           )}
 

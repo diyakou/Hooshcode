@@ -11,11 +11,13 @@ const i18n = defineMessages({
   },
   disableAutoDownloadDesc: {
     id: 'updateSection.disableAutoDownloadDesc',
-    defaultMessage: 'When enabled, Houshiar Code will notify you of new versions but will not download them automatically.',
+    defaultMessage:
+      'When enabled, Houshiar Code will notify you of new versions but will not download them automatically.',
   },
   autoDownloadDisabledByEnv: {
     id: 'updateSection.autoDownloadDisabledByEnv',
-    defaultMessage: 'Automatic downloads are disabled via the GOOSE_DISABLE_AUTO_DOWNLOAD environment variable.',
+    defaultMessage:
+      'Automatic downloads are disabled via the GOOSE_DISABLE_AUTO_DOWNLOAD environment variable.',
   },
   downloadNow: {
     id: 'updateSection.downloadNow',
@@ -79,18 +81,13 @@ const i18n = defineMessages({
   },
   autoDownload: {
     id: 'updateSection.autoDownload',
-    defaultMessage: 'Houshiar Code will download the update in the background and install it the next time you quit or restart.',
+    defaultMessage:
+      'Houshiar Code will download the update in the background and install it the next time you quit or restart.',
   },
 });
 
 type UpdateStatus =
-  | 'idle'
-  | 'checking'
-  | 'downloading'
-  | 'installing'
-  | 'success'
-  | 'error'
-  | 'ready';
+  'idle' | 'checking' | 'downloading' | 'installing' | 'success' | 'error' | 'ready';
 
 interface UpdateInfo {
   currentVersion: string;

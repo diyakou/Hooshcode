@@ -244,11 +244,7 @@ export default function SettingsView({
                 <KeyRound className="h-5 w-5 text-text-secondary" />
                 {intl.formatMessage(i18n.tabAuth)}
               </TabsTrigger>
-              <TabsTrigger
-                value="app"
-                className={settingsTabClass}
-                data-testid="settings-app-tab"
-              >
+              <TabsTrigger value="app" className={settingsTabClass} data-testid="settings-app-tab">
                 <Monitor className="h-5 w-5 text-text-secondary" />
                 {intl.formatMessage(i18n.tabApp)}
               </TabsTrigger>

@@ -31,7 +31,8 @@ const i18n = defineMessages({
   },
   descriptionWithProvider: {
     id: 'configSettings.descriptionWithProvider',
-    defaultMessage: 'Edit your Houshiar Code configuration settings (current settings for {provider})',
+    defaultMessage:
+      'Edit your Houshiar Code configuration settings (current settings for {provider})',
   },
   editConfiguration: {
     id: 'configSettings.editConfiguration',

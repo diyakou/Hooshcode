@@ -28,19 +28,24 @@ export default function HoushiarUsageSection({ apiKey }: HoushiarUsageSectionPro
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchUsage = useCallback(async (key?: string) => {
-    setLoading(true);
-    setError(null);
-    try {
-      const data = await acpGetHoushiarUsage(key);
-      setUsage(data);
-    } catch (err: any) {
-      const msg = err?.message || (isPersian ? 'دریافت آمار مصرف با خطا مواجه شد' : 'Failed to fetch usage metrics');
-      setError(msg);
-    } finally {
-      setLoading(false);
-    }
-  }, [isPersian]);
+  const fetchUsage = useCallback(
+    async (key?: string) => {
+      setLoading(true);
+      setError(null);
+      try {
+        const data = await acpGetHoushiarUsage(key);
+        setUsage(data);
+      } catch (err: any) {
+        const msg =
+          err?.message ||
+          (isPersian ? 'دریافت آمار مصرف با خطا مواجه شد' : 'Failed to fetch usage metrics');
+        setError(msg);
+      } finally {
+        setLoading(false);
+      }
+    },
+    [isPersian]
+  );
 
   useEffect(() => {
     fetchUsage(apiKey);
@@ -56,15 +61,12 @@ export default function HoushiarUsageSection({ apiKey }: HoushiarUsageSectionPro
   const tokensMonth = usage?.billing?.tokens_used_month ?? 0;
   const monthLimit = usage?.billing?.monthly_token_limit ?? 40_000_000;
   const contextLimit =
-    usage?.context_limit ??
-    usage?.context?.limit ??
-    usage?.limits?.max_context_tokens ??
-    200_000;
+    usage?.context_limit ?? usage?.context?.limit ?? usage?.limits?.max_context_tokens ?? 200_000;
 
   const usagePercent =
     monthLimit > 0
       ? Math.min(100, Math.round((tokensMonth / monthLimit) * 100 * 10) / 10)
-      : usage?.usage_percent ?? 0;
+      : (usage?.usage_percent ?? 0);
 
   const formatDate = (isoString?: string) => {
     if (!isoString) return '—';
@@ -99,7 +101,9 @@ export default function HoushiarUsageSection({ apiKey }: HoushiarUsageSectionPro
             disabled={loading}
             onClick={() => {
               fetchUsage(apiKey);
-              toast.info(isPersian ? 'در حال بروزرسانی آمار مصرف...' : 'Refreshing usage metrics...');
+              toast.info(
+                isPersian ? 'در حال بروزرسانی آمار مصرف...' : 'Refreshing usage metrics...'
+              );
             }}
           >
             <RefreshCw className={`h-3.5 w-3.5 ${loading ? 'animate-spin' : ''}`} />
@@ -117,7 +121,9 @@ export default function HoushiarUsageSection({ apiKey }: HoushiarUsageSectionPro
         {loading && !usage ? (
           <div className="flex items-center justify-center gap-2 py-8 text-sm text-text-secondary">
             <Loader2 className="h-4 w-4 animate-spin text-accent" />
-            <span>{isPersian ? 'در حال دریافت اطلاعات مصرف و پلن...' : 'Loading usage and plan data...'}</span>
+            <span>
+              {isPersian ? 'در حال دریافت اطلاعات مصرف و پلن...' : 'Loading usage and plan data...'}
+            </span>
           </div>
         ) : error && !usage ? (
           <div className="rounded-lg border border-amber-500/20 bg-amber-500/10 p-3 text-center">
@@ -149,8 +155,12 @@ export default function HoushiarUsageSection({ apiKey }: HoushiarUsageSectionPro
                   <span className="inline-flex items-center gap-1 rounded-full border border-green-500/30 bg-green-500/10 px-2 py-0.5 text-[11px] font-medium text-green-600 dark:text-green-400">
                     <CheckCircle2 className="h-3 w-3" />
                     {isPersian
-                      ? (usage.status === 'active' ? 'فعال' : usage.status)
-                      : (usage.status === 'active' ? 'Active' : usage.status)}
+                      ? usage.status === 'active'
+                        ? 'فعال'
+                        : usage.status
+                      : usage.status === 'active'
+                        ? 'Active'
+                        : usage.status}
                   </span>
                 </div>
                 {usage.key_masked && (
@@ -194,7 +204,9 @@ export default function HoushiarUsageSection({ apiKey }: HoushiarUsageSectionPro
                   </span>
                 </div>
                 <div className="mt-1 text-[11px] text-text-muted">
-                  {isPersian ? `انقضا: ${formatDate(usage.expires_at)}` : `Expires: ${formatDate(usage.expires_at)}`}
+                  {isPersian
+                    ? `انقضا: ${formatDate(usage.expires_at)}`
+                    : `Expires: ${formatDate(usage.expires_at)}`}
                 </div>
               </div>
             </div>
@@ -206,7 +218,8 @@ export default function HoushiarUsageSection({ apiKey }: HoushiarUsageSectionPro
                   {isPersian ? 'مصرف این ماه:' : 'Monthly Usage:'}
                 </span>
                 <span className="font-mono text-text-secondary">
-                  {num(tokensMonth)} / {num(monthLimit)} {isPersian ? 'توکن' : 'tokens'} ({usagePercent}%)
+                  {num(tokensMonth)} / {num(monthLimit)} {isPersian ? 'توکن' : 'tokens'} (
+                  {usagePercent}%)
                 </span>
               </div>
               <div className="h-2.5 w-full overflow-hidden rounded-full bg-background-tertiary">
@@ -260,7 +273,9 @@ export default function HoushiarUsageSection({ apiKey }: HoushiarUsageSectionPro
                   <Clock className="h-3.5 w-3.5" />
                   <span>
                     {isPersian ? 'آخرین درخواست: مدل ' : 'Last Request: Model '}
-                    <strong className="text-text-primary font-mono">{usage.last_request.model}</strong>
+                    <strong className="text-text-primary font-mono">
+                      {usage.last_request.model}
+                    </strong>
                   </span>
                 </div>
                 <div className="font-mono text-text-secondary">

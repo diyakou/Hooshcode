@@ -34,7 +34,8 @@ const i18n = defineMessages({
   },
   templateVarHint: {
     id: 'recipeFormFields.templateVarHint',
-    defaultMessage: "Use '{{parameter_name}}' to define parameters that can be filled in when running the recipe.",
+    defaultMessage:
+      "Use '{{parameter_name}}' to define parameters that can be filled in when running the recipe.",
   },
   initialPrompt: {
     id: 'recipeFormFields.initialPrompt',
@@ -62,7 +63,8 @@ const i18n = defineMessages({
   },
   parametersDescription: {
     id: 'recipeFormFields.parametersDescription',
-    defaultMessage: "Parameters will be automatically detected from '{{parameter_name}}' syntax in instructions/prompt/activities or you can manually add them below.",
+    defaultMessage:
+      "Parameters will be automatically detected from '{{parameter_name}}' syntax in instructions/prompt/activities or you can manually add them below.",
   },
   parameterNamePlaceholder: {
     id: 'recipeFormFields.parameterNamePlaceholder',

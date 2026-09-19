@@ -23,7 +23,8 @@ const i18n = defineMessages({
   },
   conflictWarning: {
     id: 'shortcutRecorder.conflictWarning',
-    defaultMessage: 'This shortcut is already used by {label}. Saving will reassign it to this action.',
+    defaultMessage:
+      'This shortcut is already used by {label}. Saving will reassign it to this action.',
   },
 });
 
@@ -188,9 +189,7 @@ export function ShortcutRecorder({
               {formatShortcut(capturedShortcut)}
             </span>
           ) : (
-            <span className="text-text-secondary">
-              {intl.formatMessage(i18n.clickToRecord)}
-            </span>
+            <span className="text-text-secondary">{intl.formatMessage(i18n.clickToRecord)}</span>
           )}
         </div>
         <Button

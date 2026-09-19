@@ -114,7 +114,8 @@ const i18n = defineMessages({
   },
   localModelsDescription: {
     id: 'switchModelModal.localModelsDescription',
-    defaultMessage: 'To use local inference, you need to download a model to your computer first. Go to Settings → Models to manage local models.',
+    defaultMessage:
+      'To use local inference, you need to download a model to your computer first. Go to Settings → Models to manage local models.',
   },
   goToSettings: {
     id: 'switchModelModal.goToSettings',

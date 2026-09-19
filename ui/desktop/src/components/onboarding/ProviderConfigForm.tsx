@@ -23,7 +23,8 @@ const i18n = defineMessages({
   },
   deviceCodeFlowHint: {
     id: 'providerConfigForm.deviceCodeFlowHint',
-    defaultMessage: 'A browser window will open. The verification code will appear here so you can enter it to complete sign-in.',
+    defaultMessage:
+      'A browser window will open. The verification code will appear here so you can enter it to complete sign-in.',
   },
   signingIn: {
     id: 'providerConfigForm.signingIn',

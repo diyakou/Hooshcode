@@ -25,13 +25,7 @@ export type Usage = {
 };
 
 export type SessionType =
-  | 'user'
-  | 'scheduled'
-  | 'sub_agent'
-  | 'hidden'
-  | 'terminal'
-  | 'gateway'
-  | 'acp';
+  'user' | 'scheduled' | 'sub_agent' | 'hidden' | 'terminal' | 'gateway' | 'acp';
 
 export type Session = {
   accumulated_cost?: number | null;

@@ -63,7 +63,8 @@ const i18n = defineMessages({
   },
   localModelsNote: {
     id: 'localModelPicker.localModelsNote',
-    defaultMessage: 'Local models keep everything on your machine for full privacy. Performance and context window size may vary compared to cloud providers depending on your hardware and model size.',
+    defaultMessage:
+      'Local models keep everything on your machine for full privacy. Performance and context window size may vary compared to cloud providers depending on your hardware and model size.',
   },
   failedToLoad: {
     id: 'localModelPicker.failedToLoad',

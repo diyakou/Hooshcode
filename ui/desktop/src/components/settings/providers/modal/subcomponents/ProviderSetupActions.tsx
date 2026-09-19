@@ -7,7 +7,8 @@ import { defineMessages, useIntl } from '../../../../../i18n';
 const i18n = defineMessages({
   cannotDeleteActive: {
     id: 'providerSetupActions.cannotDeleteActive',
-    defaultMessage: 'You cannot delete {providerName} while it\'s currently in use. Please switch to a different model before deleting this provider.',
+    defaultMessage:
+      "You cannot delete {providerName} while it's currently in use. Please switch to a different model before deleting this provider.",
   },
   ok: {
     id: 'providerSetupActions.ok',
@@ -15,7 +16,8 @@ const i18n = defineMessages({
   },
   confirmDeleteMessage: {
     id: 'providerSetupActions.confirmDeleteMessage',
-    defaultMessage: 'Are you sure you want to delete the configuration parameters for {providerName}? This action cannot be undone.',
+    defaultMessage:
+      'Are you sure you want to delete the configuration parameters for {providerName}? This action cannot be undone.',
   },
   confirmDelete: {
     id: 'providerSetupActions.confirmDelete',
@@ -79,9 +81,7 @@ export default function ProviderSetupActions({
           <div className="w-full px-6 py-4 bg-yellow-600/20 border-t border-yellow-500/30">
             <p className="text-yellow-500 text-sm mb-2 flex items-start">
               <AlertTriangle className="h-4 w-4 mr-2 mt-0.5 flex-shrink-0" />
-              <span>
-                {intl.formatMessage(i18n.cannotDeleteActive, { providerName })}
-              </span>
+              <span>{intl.formatMessage(i18n.cannotDeleteActive, { providerName })}</span>
             </p>
           </div>
           <Button

@@ -1,11 +1,5 @@
 import React, { useState } from 'react';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from '../ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '../ui/dialog';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { FolderOpen, Plus, FileText, Upload } from 'lucide-react';
@@ -60,7 +54,10 @@ export function AddSkillDialog({ open, onOpenChange, onSkillAdded }: AddSkillDia
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const cleanName = name.trim().toLowerCase().replace(/[^a-z0-9-]/g, '-');
+    const cleanName = name
+      .trim()
+      .toLowerCase()
+      .replace(/[^a-z0-9-]/g, '-');
     if (!cleanName) {
       toast.error('Please provide a valid skill name (letters, numbers, hyphens)');
       return;

@@ -32,7 +32,8 @@ const i18n = defineMessages({
   },
   hiddenCharsWarning: {
     id: 'recipeWarningModal.hiddenCharsWarning',
-    defaultMessage: 'This recipe contains hidden characters that will be ignored for your safety, as they could be used for malicious purposes.',
+    defaultMessage:
+      'This recipe contains hidden characters that will be ignored for your safety, as they could be used for malicious purposes.',
   },
   recipePreview: {
     id: 'recipeWarningModal.recipePreview',

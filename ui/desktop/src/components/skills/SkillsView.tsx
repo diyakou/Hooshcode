@@ -66,13 +66,7 @@ interface SkillEntry {
   writable: boolean;
 }
 
-function SkillItem({
-  skill,
-  onDeleted,
-}: {
-  skill: SkillEntry;
-  onDeleted: () => void;
-}) {
+function SkillItem({ skill, onDeleted }: { skill: SkillEntry; onDeleted: () => void }) {
   const isCustom = skill.writable && !skill.path.startsWith('builtin://');
 
   const handleDelete = async (e: React.MouseEvent) => {
@@ -336,11 +330,7 @@ export default function SkillsView() {
         </div>
       </div>
 
-      <AddSkillDialog
-        open={isAddOpen}
-        onOpenChange={setIsAddOpen}
-        onSkillAdded={loadSkills}
-      />
+      <AddSkillDialog open={isAddOpen} onOpenChange={setIsAddOpen} onSkillAdded={loadSkills} />
     </MainPanelLayout>
   );
 }

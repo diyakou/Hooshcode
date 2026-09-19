@@ -996,7 +996,8 @@ pre:has(> code.bg-inline-code) {
 :root[dir='rtl'],
 .rtl-layout {
   direction: rtl;
-  font-family: -apple-system, BlinkMacSystemFont, 'Vazirmatn', 'Sahel', 'Segoe UI', Tahoma, Arial, sans-serif;
+  font-family:
+    -apple-system, BlinkMacSystemFont, 'Vazirmatn', 'Sahel', 'Segoe UI', Tahoma, Arial, sans-serif;
 }
 
 [dir='rtl'] [dir='ltr'] {

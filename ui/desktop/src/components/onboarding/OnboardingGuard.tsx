@@ -56,11 +56,7 @@ export default function OnboardingGuard({ children }: OnboardingGuardProps) {
 
         try {
           const secrets = await acpListProviderSecrets();
-          if (
-            secrets.some(
-              (s) => s.provider?.toLowerCase().includes('houshiar') && s.hasSecret
-            )
-          ) {
+          if (secrets.some((s) => s.provider?.toLowerCase().includes('houshiar') && s.hasSecret)) {
             isConfigured = true;
           }
         } catch {}
@@ -137,10 +133,8 @@ export default function OnboardingGuard({ children }: OnboardingGuardProps) {
       let models: string[] = [];
       try {
         const data = await response.json();
-        const arr = Array.isArray(data) ? data : (data.data || data.models || []);
-        models = arr
-          .map((m: any) => (typeof m === 'string' ? m : (m.id || m.name)))
-          .filter(Boolean);
+        const arr = Array.isArray(data) ? data : data.data || data.models || [];
+        models = arr.map((m: any) => (typeof m === 'string' ? m : m.id || m.name)).filter(Boolean);
       } catch {
         setError('دریافت مدلها با خطا مواجه شد');
         setIsValidating(false);
@@ -149,7 +143,7 @@ export default function OnboardingGuard({ children }: OnboardingGuardProps) {
 
       const defaultModel = models.includes('claude-sonnet-5')
         ? 'claude-sonnet-5'
-        : (models[0] || 'claude-sonnet-5');
+        : models[0] || 'claude-sonnet-5';
 
       if (models.length > 0) {
         try {
@@ -162,9 +156,7 @@ export default function OnboardingGuard({ children }: OnboardingGuardProps) {
       await acpUpsertConfig('CUSTOM_HOUSHIAR_API_KEY', trimmedKey, true);
 
       try {
-        await acpSaveProviderConfig('houshiar', [
-          { key: 'HOUSHIAR_API_KEY', value: trimmedKey },
-        ]);
+        await acpSaveProviderConfig('houshiar', [{ key: 'HOUSHIAR_API_KEY', value: trimmedKey }]);
       } catch {
         try {
           await acpSaveProviderConfig('custom_houshiar', [
@@ -212,11 +204,13 @@ export default function OnboardingGuard({ children }: OnboardingGuardProps) {
           <div className="mb-4">
             <Goose className="size-8 mx-auto" />
           </div>
-          <h1 className="text-xl font-light mb-3">{intl.formatMessage(i18n.checkProviderErrorTitle)}</h1>
-          <p className="text-text-muted mb-6">{intl.formatMessage(i18n.checkProviderErrorDescription)}</p>
-          <Button onClick={() => checkProvider()}>
-            {intl.formatMessage(i18n.retry)}
-          </Button>
+          <h1 className="text-xl font-light mb-3">
+            {intl.formatMessage(i18n.checkProviderErrorTitle)}
+          </h1>
+          <p className="text-text-muted mb-6">
+            {intl.formatMessage(i18n.checkProviderErrorDescription)}
+          </p>
+          <Button onClick={() => checkProvider()}>{intl.formatMessage(i18n.retry)}</Button>
         </div>
       </div>
     );
@@ -301,8 +295,12 @@ export default function OnboardingGuard({ children }: OnboardingGuardProps) {
             disabled={isValidating || !apiKey.trim()}
           >
             {isValidating
-              ? (isPersian ? 'در حال اتصال...' : 'Connecting...')
-              : (isPersian ? 'اتصال به هوشیار' : 'Connect to Houshiar')}
+              ? isPersian
+                ? 'در حال اتصال...'
+                : 'Connecting...'
+              : isPersian
+                ? 'اتصال به هوشیار'
+                : 'Connect to Houshiar'}
           </Button>
         </form>
       </div>

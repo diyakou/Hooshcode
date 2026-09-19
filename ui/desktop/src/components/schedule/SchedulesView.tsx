@@ -43,7 +43,8 @@ const i18n = defineMessages({
   createSchedule: { id: 'schedulesView.createSchedule', defaultMessage: 'Create Schedule' },
   description: {
     id: 'schedulesView.description',
-    defaultMessage: 'Create and manage scheduled tasks to run recipes automatically at specified times.',
+    defaultMessage:
+      'Create and manage scheduled tasks to run recipes automatically at specified times.',
   },
   errorPrefix: { id: 'schedulesView.errorPrefix', defaultMessage: 'Error: {error}' },
   noSchedules: { id: 'schedulesView.noSchedules', defaultMessage: 'No schedules yet' },

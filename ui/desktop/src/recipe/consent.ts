@@ -34,9 +34,7 @@ export function getRecipeConsentRequestsSnapshot(): RecipeConsentRequest[] {
   return snapshot;
 }
 
-export function requestRecipeConsent(
-  input: Omit<RecipeConsentRequest, 'id'>
-): Promise<boolean> {
+export function requestRecipeConsent(input: Omit<RecipeConsentRequest, 'id'>): Promise<boolean> {
   const request: RecipeConsentRequest = { id: `recipe_consent_${uuidv7()}`, ...input };
   return new Promise<boolean>((resolve) => {
     pendingRequests.set(request.id, { request, resolve });

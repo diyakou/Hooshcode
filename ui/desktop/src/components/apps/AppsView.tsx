@@ -29,7 +29,8 @@ const i18n = defineMessages({
   },
   description: {
     id: 'appsView.description',
-    defaultMessage: 'Applications from your MCP servers and Apps built by Houshiar Code itself. You can ask it to create new apps through the chat interface and they will appear here.',
+    defaultMessage:
+      'Applications from your MCP servers and Apps built by Houshiar Code itself. You can ask it to create new apps through the chat interface and they will appear here.',
   },
   loading: {
     id: 'appsView.loading',
@@ -41,7 +42,8 @@ const i18n = defineMessages({
   },
   noAppsDescription: {
     id: 'appsView.noAppsDescription',
-    defaultMessage: 'Open a chat and ask Houshiar Code for the app you want to have. It can build one for you and that will appear here. Or if somebody shared an app, you can import it using the button above.',
+    defaultMessage:
+      'Open a chat and ask Houshiar Code for the app you want to have. It can build one for you and that will appear here. Or if somebody shared an app, you can import it using the button above.',
   },
   customApp: {
     id: 'appsView.customApp',
@@ -189,9 +191,7 @@ export default function AppsView() {
 
   const handleDeleteApp = async (app: GooseApp) => {
     if (
-      !window.confirm(
-        intl.formatMessage(i18n.deleteConfirm, { name: formatAppName(app.name) })
-      )
+      !window.confirm(intl.formatMessage(i18n.deleteConfirm, { name: formatAppName(app.name) }))
     ) {
       return;
     }

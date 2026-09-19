@@ -18,7 +18,7 @@ export async function acpGetHoushiarUsage(customApiKey?: string): Promise<Houshi
           method: 'GET',
           headers: {
             'x-api-key': key,
-            'Authorization': `Bearer ${key}`,
+            Authorization: `Bearer ${key}`,
             'x-client-brand': 'houshiar-code',
           },
         });

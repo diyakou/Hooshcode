@@ -41,7 +41,8 @@ const i18n = defineMessages({
   },
   cannotDeleteActive: {
     id: 'providerConfigurationModal.cannotDeleteActive',
-    defaultMessage: "You cannot delete this provider while it's currently in use. Please switch to a different model first.",
+    defaultMessage:
+      "You cannot delete this provider while it's currently in use. Please switch to a different model first.",
   },
   deleteConfirmation: {
     id: 'providerConfigurationModal.deleteConfirmation',
@@ -93,7 +94,8 @@ const i18n = defineMessages({
   },
   deviceCodeFlowHint: {
     id: 'providerConfigurationModal.deviceCodeFlowHint',
-    defaultMessage: 'A browser window will open. The verification code will appear here so you can enter it to complete sign-in.',
+    defaultMessage:
+      'A browser window will open. The verification code will appear here so you can enter it to complete sign-in.',
   },
   externalSetupIntro: {
     id: 'providerConfigurationModal.externalSetupIntro',
@@ -121,7 +123,8 @@ const i18n = defineMessages({
   },
   huggingFaceOAuthDescription: {
     id: 'providerConfigurationModal.huggingFaceOAuthDescription',
-    defaultMessage: 'Sign in to use Hugging Face Inference Providers without manually entering an API token.',
+    defaultMessage:
+      'Sign in to use Hugging Face Inference Providers without manually entering an API token.',
   },
   deviceCodeVisit: {
     id: 'providerConfigurationModal.deviceCodeVisit',

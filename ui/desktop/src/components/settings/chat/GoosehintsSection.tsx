@@ -11,7 +11,8 @@ const i18n = defineMessages({
   },
   description: {
     id: 'goosehintsSection.description',
-    defaultMessage: "Configure your project's .goosehints file to provide additional context to Houshiar Code",
+    defaultMessage:
+      "Configure your project's .goosehints file to provide additional context to Houshiar Code",
   },
   configure: {
     id: 'goosehintsSection.configure',

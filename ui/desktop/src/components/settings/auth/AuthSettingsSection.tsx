@@ -59,7 +59,8 @@ const i18n = defineMessages({
   },
   activeProviderWarning: {
     id: 'authSettings.activeProviderWarning',
-    defaultMessage: 'This is the active provider. New requests may fail until you configure another credential.',
+    defaultMessage:
+      'This is the active provider. New requests may fail until you configure another credential.',
   },
   delete: {
     id: 'authSettings.delete',
@@ -202,10 +203,8 @@ export default function AuthSettingsSection() {
       let models: string[] = [];
       try {
         const data = await response.json();
-        const arr = Array.isArray(data) ? data : (data.data || data.models || []);
-        models = arr
-          .map((m: any) => (typeof m === 'string' ? m : (m.id || m.name)))
-          .filter(Boolean);
+        const arr = Array.isArray(data) ? data : data.data || data.models || [];
+        models = arr.map((m: any) => (typeof m === 'string' ? m : m.id || m.name)).filter(Boolean);
       } catch {}
 
       if (models.length > 0) {
@@ -216,16 +215,14 @@ export default function AuthSettingsSection() {
 
       const defaultModel = models.includes('claude-sonnet-5')
         ? 'claude-sonnet-5'
-        : (models[0] || 'claude-sonnet-5');
+        : models[0] || 'claude-sonnet-5';
 
       // Direct secret persistence for both key variants
       await acpUpsertConfig('HOUSHIAR_API_KEY', trimmedKey, true);
       await acpUpsertConfig('CUSTOM_HOUSHIAR_API_KEY', trimmedKey, true);
 
       try {
-        await acpSaveProviderConfig('houshiar', [
-          { key: 'HOUSHIAR_API_KEY', value: trimmedKey },
-        ]);
+        await acpSaveProviderConfig('houshiar', [{ key: 'HOUSHIAR_API_KEY', value: trimmedKey }]);
       } catch {
         try {
           await acpSaveProviderConfig('custom_houshiar', [
@@ -379,11 +376,7 @@ export default function AuthSettingsSection() {
                   dir="ltr"
                   autoFocus
                 />
-                {keyError && (
-                  <p className="text-xs text-red-500 font-medium">
-                    {keyError}
-                  </p>
-                )}
+                {keyError && <p className="text-xs text-red-500 font-medium">{keyError}</p>}
               </div>
               <div className="flex items-center gap-2 justify-end">
                 {hasHoushiarKey && (

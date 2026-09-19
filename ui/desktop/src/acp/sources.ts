@@ -65,4 +65,3 @@ export async function deleteSkillSource(path: string): Promise<void> {
     path,
   });
 }
-

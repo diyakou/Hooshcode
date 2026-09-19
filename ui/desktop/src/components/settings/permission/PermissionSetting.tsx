@@ -14,7 +14,8 @@ const i18n = defineMessages({
   },
   permissionRulesDescription: {
     id: 'permissionSetting.permissionRulesDescription',
-    defaultMessage: 'Hidden instructions that will be passed to the provider to help direct and add context to your responses.',
+    defaultMessage:
+      'Hidden instructions that will be passed to the provider to help direct and add context to your responses.',
   },
   extensionRules: {
     id: 'permissionSetting.extensionRules',
@@ -119,7 +120,9 @@ export default function PermissionSettingsView({ onClose }: { onClose: () => voi
                 <circle cx="7.5" cy="15.5" r="5.5" />
               </svg>
             </div>
-            <h1 className="text-3xl font-medium text-text-primary mt-4">{intl.formatMessage(i18n.permissionRules)}</h1>
+            <h1 className="text-3xl font-medium text-text-primary mt-4">
+              {intl.formatMessage(i18n.permissionRules)}
+            </h1>
             <p className="text-text-secondary">
               {intl.formatMessage(i18n.permissionRulesDescription)}
             </p>

@@ -66,4 +66,3 @@ export function formatClockDisplay(
     return { time, meridiem, hour };
   }
 }
-

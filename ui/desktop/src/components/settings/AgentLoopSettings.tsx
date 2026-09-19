@@ -52,7 +52,8 @@ const i18n = defineMessages({
   },
   toolPairCompactionDescription: {
     id: 'settings.agentLoop.operations.toolPairCompaction.description',
-    defaultMessage: 'Summarizes older tool requests and responses to save context. The cutoff is automatic when blank.',
+    defaultMessage:
+      'Summarizes older tool requests and responses to save context. The cutoff is automatic when blank.',
   },
   recipeRetryTitle: {
     id: 'settings.agentLoop.operations.recipeRetry.title',

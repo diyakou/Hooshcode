@@ -26,11 +26,13 @@ const i18n = defineMessages({
   },
   description: {
     id: 'extensionsView.description',
-    defaultMessage: "These extensions use the Model Context Protocol (MCP). They can expand Houshiar Code's capabilities using three main components: Prompts, Resources, and Tools. {searchShortcut} to search.",
+    defaultMessage:
+      "These extensions use the Model Context Protocol (MCP). They can expand Houshiar Code's capabilities using three main components: Prompts, Resources, and Tools. {searchShortcut} to search.",
   },
   defaultNote: {
     id: 'extensionsView.defaultNote',
-    defaultMessage: 'Extensions enabled here are used as the default for new chats. You can also toggle active extensions during chat.',
+    defaultMessage:
+      'Extensions enabled here are used as the default for new chats. You can also toggle active extensions during chat.',
   },
   addCustomExtension: {
     id: 'extensionsView.addCustomExtension',

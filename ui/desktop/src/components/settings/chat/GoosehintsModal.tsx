@@ -19,15 +19,18 @@ const i18n = defineMessages({
   },
   dialogDescription: {
     id: 'goosehintsModal.dialogDescription',
-    defaultMessage: 'Provide additional context about your project to improve communication with Houshiar Code',
+    defaultMessage:
+      'Provide additional context about your project to improve communication with Houshiar Code',
   },
   helpText1: {
     id: 'goosehintsModal.helpText1',
-    defaultMessage: '.goosehints is a text file used to provide additional context about your project and improve the communication with Houshiar Code.',
+    defaultMessage:
+      '.goosehints is a text file used to provide additional context about your project and improve the communication with Houshiar Code.',
   },
   helpText2: {
     id: 'goosehintsModal.helpText2',
-    defaultMessage: "Please make sure {bold} extension is enabled in the extensions page. This extension is required to use .goosehints. You'll need to restart your session for .goosehints updates to take effect.",
+    defaultMessage:
+      "Please make sure {bold} extension is enabled in the extensions page. This extension is required to use .goosehints. You'll need to restart your session for .goosehints updates to take effect.",
   },
   helpText3: {
     id: 'goosehintsModal.helpText3',
@@ -101,10 +104,7 @@ const HelpText = () => {
               variant="link"
               className="text-blue-500 hover:text-blue-600 p-0 h-auto"
               onClick={() =>
-                window.open(
-                  'https://goose-docs.ai/docs/guides/using-goosehints/',
-                  '_blank'
-                )
+                window.open('https://goose-docs.ai/docs/guides/using-goosehints/', '_blank')
               }
             >
               {intl.formatMessage(i18n.helpTextLink)}

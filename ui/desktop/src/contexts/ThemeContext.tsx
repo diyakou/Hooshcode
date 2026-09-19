@@ -113,9 +113,7 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
 
     const handleThemeChanged = (_event: unknown, ...args: unknown[]) => {
       const themeData = args[0] as { useSystemTheme: boolean; theme: ThemeId };
-      const newPreference: ThemePreference = themeData.useSystemTheme
-        ? 'system'
-        : themeData.theme;
+      const newPreference: ThemePreference = themeData.useSystemTheme ? 'system' : themeData.theme;
 
       setUserThemePreferenceState(newPreference);
       setResolvedThemeId(resolveThemeId(newPreference));

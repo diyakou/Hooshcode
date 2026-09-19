@@ -6,7 +6,8 @@ import { defineMessages, useIntl } from '../../i18n';
 const i18n = defineMessages({
   unusedWarningTitle: {
     id: 'parameterInput.unusedWarningTitle',
-    defaultMessage: 'This parameter is not used in the instructions or prompt. It will be available for manual input but may not be needed.',
+    defaultMessage:
+      'This parameter is not used in the instructions or prompt. It will be available for manual input but may not be needed.',
   },
   unused: {
     id: 'parameterInput.unused',
@@ -145,7 +146,9 @@ const ParameterInput: React.FC<ParameterInputProps> = ({
                 title={intl.formatMessage(i18n.unusedWarningTitle)}
               >
                 <AlertTriangle className="w-4 h-4 text-orange-500" />
-                <span className="text-xs text-orange-500 font-normal">{intl.formatMessage(i18n.unused)}</span>
+                <span className="text-xs text-orange-500 font-normal">
+                  {intl.formatMessage(i18n.unused)}
+                </span>
               </div>
             )}
           </div>

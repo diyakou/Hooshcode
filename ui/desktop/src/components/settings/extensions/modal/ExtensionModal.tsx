@@ -50,7 +50,8 @@ const i18n = defineMessages({
   },
   unsavedChangesMessage: {
     id: 'extensionModal.unsavedChangesMessage',
-    defaultMessage: 'You have unsaved changes to the extension configuration. Are you sure you want to close without saving?',
+    defaultMessage:
+      'You have unsaved changes to the extension configuration. Are you sure you want to close without saving?',
   },
   closeWithoutSaving: {
     id: 'extensionModal.closeWithoutSaving',

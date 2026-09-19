@@ -144,7 +144,8 @@ const i18n = defineMessages({
   },
   restartDescription: {
     id: 'keyboardShortcuts.restartDescription',
-    defaultMessage: 'Changes to application shortcuts (like New Chat, Settings, etc.) require restarting Houshiar Code to take effect. Global shortcuts (Focus Window, Quick Launcher) work immediately.',
+    defaultMessage:
+      'Changes to application shortcuts (like New Chat, Settings, etc.) require restarting Houshiar Code to take effect. Global shortcuts (Focus Window, Quick Launcher) work immediately.',
   },
   dismiss: {
     id: 'keyboardShortcuts.dismiss',
@@ -182,11 +183,13 @@ const i18n = defineMessages({
   },
   shortcutConflictToggleDetail: {
     id: 'keyboardShortcuts.shortcutConflictToggleDetail',
-    defaultMessage: 'Enabling this will remove the shortcut from "{conflictLabel}" and assign it to "{targetLabel}". Do you want to continue?',
+    defaultMessage:
+      'Enabling this will remove the shortcut from "{conflictLabel}" and assign it to "{targetLabel}". Do you want to continue?',
   },
   shortcutConflictSaveDetail: {
     id: 'keyboardShortcuts.shortcutConflictSaveDetail',
-    defaultMessage: 'Saving this will remove the shortcut from "{conflictLabel}" and assign it to "{targetLabel}". Do you want to continue?',
+    defaultMessage:
+      'Saving this will remove the shortcut from "{conflictLabel}" and assign it to "{targetLabel}". Do you want to continue?',
   },
   reassignShortcut: {
     id: 'keyboardShortcuts.reassignShortcut',
@@ -367,10 +370,7 @@ export default function KeyboardShortcutsSection() {
             conflictLabel: getShortcutLabel(conflictingKey, intl.formatMessage),
             targetLabel: getShortcutLabel(key, intl.formatMessage),
           }),
-          buttons: [
-            intl.formatMessage(i18n.reassignShortcut),
-            intl.formatMessage(i18n.cancel),
-          ],
+          buttons: [intl.formatMessage(i18n.reassignShortcut), intl.formatMessage(i18n.cancel)],
           defaultId: 1,
         });
 
@@ -417,10 +417,7 @@ export default function KeyboardShortcutsSection() {
           conflictLabel: getShortcutLabel(conflictingKey, intl.formatMessage),
           targetLabel: getShortcutLabel(editingKey, intl.formatMessage),
         }),
-        buttons: [
-          intl.formatMessage(i18n.reassignShortcut),
-          intl.formatMessage(i18n.cancel),
-        ],
+        buttons: [intl.formatMessage(i18n.reassignShortcut), intl.formatMessage(i18n.cancel)],
         defaultId: 1,
       });
 
@@ -455,10 +452,7 @@ export default function KeyboardShortcutsSection() {
       title: intl.formatMessage(i18n.resetShortcutsTitle),
       message: intl.formatMessage(i18n.resetShortcutsMessage),
       detail: intl.formatMessage(i18n.resetShortcutsDetail),
-      buttons: [
-        intl.formatMessage(i18n.resetToDefaultsHeading),
-        intl.formatMessage(i18n.cancel),
-      ],
+      buttons: [intl.formatMessage(i18n.resetToDefaultsHeading), intl.formatMessage(i18n.cancel)],
       defaultId: 1,
     });
 

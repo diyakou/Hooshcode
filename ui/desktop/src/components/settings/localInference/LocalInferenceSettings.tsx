@@ -27,7 +27,8 @@ const i18n = defineMessages({
   },
   description: {
     id: 'localInferenceSettings.description',
-    defaultMessage: 'Download and manage local LLM models for inference without API keys. Search Hugging Face for GGUF or MLX models.',
+    defaultMessage:
+      'Download and manage local LLM models for inference without API keys. Search Hugging Face for GGUF or MLX models.',
   },
   downloading: {
     id: 'localInferenceSettings.downloading',
@@ -103,7 +104,8 @@ const i18n = defineMessages({
   },
   huggingFaceSignInNote: {
     id: 'localInferenceSettings.huggingFaceSignInNote',
-    defaultMessage: 'Sign in to increase rate limits when searching and downloading models, and to access private or gated Hugging Face repositories.',
+    defaultMessage:
+      'Sign in to increase rate limits when searching and downloading models, and to access private or gated Hugging Face repositories.',
   },
 });
 
