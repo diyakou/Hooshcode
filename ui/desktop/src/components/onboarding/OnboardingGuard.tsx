@@ -114,31 +114,26 @@ export default function OnboardingGuard({ children }: OnboardingGuardProps) {
     setSuccessMessage(null);
 
     try {
-      // Validate key by making a lightweight authenticated API request
-      const response = await fetch('https://wqai.morvism.ir/v1/models', {
-        method: 'GET',
-        headers: {
-          'x-api-key': trimmedKey,
-          'anthropic-version': '2023-06-01',
-          'x-client-brand': 'houshiar-code',
-        },
-      });
-
-      if (!response.ok) {
-        setError('کلید API نامعتبر است');
-        setIsValidating(false);
-        return;
-      }
-
       let models: string[] = [];
       try {
-        const data = await response.json();
-        const arr = Array.isArray(data) ? data : data.data || data.models || [];
-        models = arr.map((m: any) => (typeof m === 'string' ? m : m.id || m.name)).filter(Boolean);
-      } catch {
-        setError('دریافت مدلها با خطا مواجه شد');
-        setIsValidating(false);
-        return;
+        const response = await fetch('https://wqai.morvism.ir/v1/models', {
+          method: 'GET',
+          headers: {
+            'x-api-key': trimmedKey,
+            'anthropic-version': '2023-06-01',
+            'x-client-brand': 'houshiar-code',
+          },
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          const arr = Array.isArray(data) ? data : data.data || data.models || [];
+          models = arr
+            .map((m: any) => (typeof m === 'string' ? m : m.id || m.name))
+            .filter(Boolean);
+        }
+      } catch (fetchErr) {
+        console.warn('Could not fetch models directly from renderer:', fetchErr);
       }
 
       const defaultModel = models.includes('claude-sonnet-5')

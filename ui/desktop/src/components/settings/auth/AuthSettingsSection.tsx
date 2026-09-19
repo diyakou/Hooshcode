@@ -185,27 +185,27 @@ export default function AuthSettingsSection() {
     setKeyError(null);
 
     try {
-      const response = await fetch('https://wqai.morvism.ir/v1/models', {
-        method: 'GET',
-        headers: {
-          'x-api-key': trimmedKey,
-          'anthropic-version': '2023-06-01',
-          'x-client-brand': 'houshiar-code',
-        },
-      });
-
-      if (!response.ok) {
-        setKeyError('کلید API نامعتبر است یا ارتباط با سرور برقرار نشد');
-        setIsSavingKey(false);
-        return;
-      }
-
       let models: string[] = [];
       try {
-        const data = await response.json();
-        const arr = Array.isArray(data) ? data : data.data || data.models || [];
-        models = arr.map((m: any) => (typeof m === 'string' ? m : m.id || m.name)).filter(Boolean);
-      } catch {}
+        const response = await fetch('https://wqai.morvism.ir/v1/models', {
+          method: 'GET',
+          headers: {
+            'x-api-key': trimmedKey,
+            'anthropic-version': '2023-06-01',
+            'x-client-brand': 'houshiar-code',
+          },
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          const arr = Array.isArray(data) ? data : data.data || data.models || [];
+          models = arr
+            .map((m: any) => (typeof m === 'string' ? m : m.id || m.name))
+            .filter(Boolean);
+        }
+      } catch (fetchErr) {
+        console.warn('Could not fetch models directly from renderer:', fetchErr);
+      }
 
       if (models.length > 0) {
         try {
