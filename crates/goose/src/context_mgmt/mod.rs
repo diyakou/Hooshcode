@@ -247,22 +247,24 @@ pub async fn check_if_compaction_needed(
     let context_limit =
         crate::context_limit::get_context_limit(provider, &model_config.model_name).await?;
 
-    let (current_tokens, _token_source) = match session.usage.total_tokens {
-        Some(tokens) => (tokens as usize, "session metadata"),
-        None => {
-            let token_counter = create_token_counter()
-                .await
-                .map_err(|e| anyhow::anyhow!("Failed to create token counter: {}", e))?;
+    let token_counter = create_token_counter()
+        .await
+        .map_err(|e| anyhow::anyhow!("Failed to create token counter: {}", e))?;
+    let estimated_tokens: usize = messages
+        .iter()
+        .filter(|m| m.is_agent_visible())
+        .map(|msg| token_counter.count_chat_tokens("", std::slice::from_ref(msg), &[]))
+        .sum();
 
-            let token_counts: Vec<_> = messages
-                .iter()
-                .filter(|m| m.is_agent_visible())
-                .map(|msg| token_counter.count_chat_tokens("", std::slice::from_ref(msg), &[]))
-                .collect();
-
-            (token_counts.iter().sum(), "estimated")
-        }
-    };
+    // Provider usage describes the previous request and does not include the
+    // user message that just started this turn. Use the larger value so that a
+    // new message can trigger compaction before it is sent to the provider.
+    let current_tokens = session
+        .usage
+        .total_tokens
+        .map_or(estimated_tokens, |tokens| {
+            estimated_tokens.max(tokens as usize)
+        });
 
     let usage_ratio = current_tokens as f64 / context_limit as f64;
 

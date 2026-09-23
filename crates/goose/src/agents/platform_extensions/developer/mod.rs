@@ -4,9 +4,9 @@ pub mod shell;
 mod shell_output_streaming;
 pub mod tree;
 
+use crate::agents::ToolCallContext;
 use crate::agents::extension::PlatformExtensionContext;
 use crate::agents::mcp_client::{Error, McpClientTrait};
-use crate::agents::ToolCallContext;
 use anyhow::Result;
 use async_trait::async_trait;
 use edit::{EditTools, FileEditParams, FileWriteParams};
@@ -16,9 +16,9 @@ use rmcp::model::{
     Annotations, CallToolResult, ContentBlock, Implementation, InitializeResult, JsonObject,
     ListToolsResult, ServerCapabilities, TextContent, Tool, ToolAnnotations,
 };
-use schemars::{schema_for, JsonSchema};
+use schemars::{JsonSchema, schema_for};
 use serde_json::Value;
-use shell::{shell_display_name, ShellOutput, ShellParams, ShellTool};
+use shell::{ShellOutput, ShellParams, ShellTool, shell_display_name};
 use std::sync::Arc;
 use tokio_util::sync::CancellationToken;
 use tree::{TreeParams, TreeTool};
@@ -53,6 +53,9 @@ fn developer_instructions() -> &'static str {
             and file sizes. When you need to search, prefer findstr or Select-String (via shell).
             Then use type or Get-Content to gather the context you need, always reading before
             editing. Use write and edit to efficiently make changes. Test and verify as appropriate.
+
+            The default Windows shell is PowerShell. Use PowerShell syntax such as `Start-Process`
+            and `Get-Content` unless the shell tool description explicitly names another shell.
         "}
     } else {
         indoc! {"

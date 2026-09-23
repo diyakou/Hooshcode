@@ -77,10 +77,11 @@ impl CompactionOperation {
     }
 
     async fn context_tokens(&self, session: &Session, conversation: &Conversation) -> Result<i32> {
-        match session.usage.total_tokens {
-            Some(tokens) => Ok(tokens),
-            None => crate::context_mgmt::count_context_tokens(conversation).await,
-        }
+        let estimated_tokens = crate::context_mgmt::count_context_tokens(conversation).await?;
+        Ok(session
+            .usage
+            .total_tokens
+            .map_or(estimated_tokens, |tokens| estimated_tokens.max(tokens)))
     }
 
     async fn command_error(

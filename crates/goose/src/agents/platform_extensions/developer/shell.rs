@@ -2,11 +2,11 @@
 use std::path::Path;
 use std::path::PathBuf;
 use std::process::Stdio;
-use std::sync::atomic::{AtomicUsize, Ordering};
 #[cfg(not(windows))]
 use std::sync::Arc;
 #[cfg(not(windows))]
 use std::sync::Mutex;
+use std::sync::atomic::{AtomicUsize, Ordering};
 use std::time::Duration;
 
 use rmcp::model::{Annotations, CallToolResult, ContentBlock, TextContent};
@@ -17,17 +17,17 @@ use tokio::io::{AsyncBufReadExt, BufReader};
 use tokio::sync::OnceCell;
 #[cfg(not(windows))]
 use tokio::task::JoinHandle;
-use tokio_stream::{wrappers::SplitStream, StreamExt};
+use tokio_stream::{StreamExt, wrappers::SplitStream};
 use tokio_util::sync::CancellationToken;
 
 use crate::agents::tool_execution::ToolCallNotificationEmitter;
 use crate::subprocess::SubprocessExt;
 
 pub use super::shell_output_streaming::{
-    parse_shell_output_notification, ShellOutputNotificationChunk, ShellOutputNotificationParams,
-    ShellOutputStream, DEVELOPER_SHELL_OUTPUT_NOTIFICATION_METHOD,
+    DEVELOPER_SHELL_OUTPUT_NOTIFICATION_METHOD, ShellOutputNotificationChunk,
+    ShellOutputNotificationParams, ShellOutputStream, parse_shell_output_notification,
 };
-use super::shell_output_streaming::{ShellOutputBatcher, SHELL_LIVE_OUTPUT_FLUSH_INTERVAL};
+use super::shell_output_streaming::{SHELL_LIVE_OUTPUT_FLUSH_INTERVAL, ShellOutputBatcher};
 
 /// Check if the current process is running inside a Flatpak sandbox.
 ///
@@ -94,13 +94,13 @@ fn unix_shell_command_args(command_line: &str) -> [&str; 2] {
 /// Resolve the shell used to run Developer extension commands on Windows,
 /// respecting `GOOSE_SHELL`.
 ///
-/// Defaults to `cmd` when `GOOSE_SHELL` is unset. The invocation flags are
+/// Defaults to Windows PowerShell when `GOOSE_SHELL` is unset. The invocation flags are
 /// chosen automatically from the executable name in `build_shell_command`,
 /// so callers only ever provide a bare executable path or name — see that
 /// function for the flag mapping.
 #[cfg(windows)]
 fn windows_shell() -> String {
-    std::env::var("GOOSE_SHELL").unwrap_or_else(|_| "cmd".to_string())
+    std::env::var("GOOSE_SHELL").unwrap_or_else(|_| "powershell.exe".to_string())
 }
 
 /// Short, human-readable name of a shell path (the file stem), used both to
@@ -1284,25 +1284,19 @@ mod tests {
 
     #[cfg(windows)]
     #[tokio::test]
-    async fn cmd_rejects_newline_in_command() {
-        for command in ["echo a\necho b", "echo a\r\necho b", "echo a\recho b"] {
-            let tool = ShellTool::new_for_test().unwrap();
-            let result = tool
-                .shell(ShellParams {
-                    command: command.to_string(),
-                    timeout_secs: None,
-                })
-                .await;
-            assert_eq!(
-                result.is_error,
-                Some(true),
-                "expected error for {command:?}"
-            );
-            assert!(
-                extract_text(&result).contains("cmd.exe"),
-                "error should mention cmd.exe for {command:?}"
-            );
-        }
+    async fn default_powershell_accepts_multiline_commands() {
+        let tool = ShellTool::new_for_test().unwrap();
+        let result = tool
+            .shell(ShellParams {
+                command: "Write-Output first\nWrite-Output second".to_string(),
+                timeout_secs: None,
+            })
+            .await;
+
+        assert_eq!(result.is_error, Some(false));
+        let output = extract_text(&result);
+        assert!(output.contains("first"));
+        assert!(output.contains("second"));
     }
 
     #[test]
