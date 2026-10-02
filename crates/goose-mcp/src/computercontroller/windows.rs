@@ -16,7 +16,8 @@ pub async fn run_powershell_script(script: &str) -> Result<String, ErrorData> {
     let output = tokio::process::Command::new("powershell.exe")
         .args([
             "-NoProfile",
-            "-NonInteractive",
+            "-WindowStyle",
+            "Hidden",
             "-ExecutionPolicy",
             "Bypass",
             "-EncodedCommand",
@@ -411,13 +412,35 @@ Write-Output "Sent hotkey: {keys_str} ({send_keys_format})"
                     let script = format!(
                         r#"
 Add-Type -AssemblyName Microsoft.VisualBasic
+$winActivateDef = @"
+using System;
+using System.Runtime.InteropServices;
+public class WinActivate {{
+    [DllImport("user32.dll")] public static extern bool SetForegroundWindow(IntPtr hWnd);
+    [DllImport("user32.dll")] public static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
+    public const int SW_RESTORE = 9;
+}}
+"@
+if (-not ([System.Management.Automation.PSTypeName]'WinActivate').Type) {{
+    Add-Type -TypeDefinition $winActivateDef
+}}
 $query = '{target_name}'
-$proc = Get-Process | Where-Object {{ $_.MainWindowTitle -match $query -or $_.ProcessName -match $query }} | Select-Object -First 1
+$proc = Get-Process | Where-Object {{ $_.MainWindowTitle.Length -gt 0 -and ($_.MainWindowTitle -match $query -or $_.ProcessName -match $query) }} | Select-Object -First 1
 if ($proc) {{
-    [Microsoft.VisualBasic.Interaction]::AppActivate($proc.Id)
+    $hwnd = $proc.MainWindowHandle
+    if ($hwnd -ne [IntPtr]::Zero) {{
+        [WinActivate]::ShowWindow($hwnd, [WinActivate]::SW_RESTORE) | Out-Null
+        [WinActivate]::SetForegroundWindow($hwnd) | Out-Null
+    }}
     Write-Output "Activated window: '$($proc.MainWindowTitle)' (Process: $($proc.ProcessName), PID: $($proc.Id))"
 }} else {{
-    Write-Output "No active window found matching '$query'"
+    $started = Start-Process $query -PassThru -ErrorAction SilentlyContinue
+    if ($started) {{
+        Start-Sleep -Milliseconds 800
+        Write-Output "Launched process: $query (PID: $($started.Id))"
+    }} else {{
+        Write-Output "No window found and could not launch: $query"
+    }}
 }}
 "#
                     );
@@ -430,6 +453,29 @@ Get-Process | Where-Object { $_.MainWindowTitle.Length -gt 0 } | Select-Object I
                 }
             }
 
+            "open" => {
+                let target = if args.len() > 1 {
+                    args[1..].join(" ")
+                } else {
+                    "".to_string()
+                };
+                if target.is_empty() {
+                    return Err(ErrorData::new(
+                        ErrorCode::INVALID_PARAMS,
+                        "open command requires a URL or file path".to_string(),
+                        None,
+                    ));
+                }
+                let escaped = target.replace('\'', "''");
+                let script = format!(
+                    r#"
+Start-Process '{escaped}'
+Write-Output "Opened: {escaped}"
+"#
+                );
+                result_text = run_powershell_script(&script).await?;
+            }
+
             "list" => {
                 let script = r#"
 Get-Process | Where-Object { $_.MainWindowTitle.Length -gt 0 } | Select-Object Id, ProcessName, MainWindowTitle | Format-Table -AutoSize | Out-String -Width 120
@@ -440,7 +486,7 @@ Get-Process | Where-Object { $_.MainWindowTitle.Length -gt 0 } | Select-Object I
             _ => {
                 return Err(ErrorData::new(
                     ErrorCode::INVALID_PARAMS,
-                    format!("Unknown action: '{}'. Supported actions: see, click, move, drag, type, press, hotkey, app switch, list windows", action),
+                    format!("Unknown action: '{}'. Supported actions: see, click, move, drag, type, press, hotkey, app switch, open, list windows", action),
                     None,
                 ));
             }

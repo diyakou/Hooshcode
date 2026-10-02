@@ -13,6 +13,7 @@ const DEFAULT_CONNECT_SOURCES = [
   'https://api.github.com',
   'https://github.com',
   'https://objects.githubusercontent.com',
+  'https://wqai.morvism.ir',
 ];
 
 export interface BackendOriginLease {

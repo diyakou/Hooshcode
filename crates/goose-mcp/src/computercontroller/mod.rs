@@ -932,7 +932,8 @@ impl ComputerControllerServer {
             - type --text \"...\" [--return] [--clear]: Type/paste text into active field.
             - press <key> [--count N]: Press special key (enter, tab, space, escape, backspace, delete, up, down, left, right, f1-f12).
             - hotkey --keys <k1,k2,...>: Trigger shortcut combo like 'ctrl,s', 'ctrl,z', 'ctrl,shift,z', 'ctrl,k', 'ctrl,m', 'ctrl,t', 'ctrl,j'.
-            - app switch <name>: Bring application to foreground and focus (e.g. 'Photoshop', 'Premiere', 'Code').
+            - app switch <name>: Bring application to foreground; if not running, launches it (e.g. 'Photoshop', 'Premiere', 'notepad').
+            - open <url-or-path>: Open a URL or file with the default application (e.g. 'open https://example.com', 'open C:\\file.pdf').
             - list windows: List active desktop windows and titles.
             
             Set capture_screenshot=true to capture screen after action to verify result.

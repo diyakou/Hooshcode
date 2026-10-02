@@ -99,6 +99,7 @@ module.exports = {
     },
     {
       name: '@electron-forge/maker-deb',
+      platforms: ['linux'],
       config: {
         name: 'houshiar-code',
         bin: 'goose',
@@ -115,6 +116,7 @@ module.exports = {
     },
     {
       name: '@electron-forge/maker-rpm',
+      platforms: ['linux'],
       config: {
         name: 'houshiar-code',
         bin: 'goose',
@@ -126,6 +128,21 @@ module.exports = {
           icon: 'src/images/icon.png',
           prefix: '/opt',
           ...(isLinuxVulkanBuild ? { requires: ['vulkan-loader'] } : {}),
+        },
+      },
+    },
+    {
+      name: '@electron-forge/maker-flatpak',
+      platforms: ['linux'],
+      config: {
+        options: {
+          id: 'ir.houshiar-ai.houshiarcode',
+          icon: 'src/images/icon.png',
+          categories: ['Development'],
+          runtimeVersion: '24.08',
+          baseVersion: '24.08',
+          branch: 'stable',
+          files: [],
         },
       },
     },
