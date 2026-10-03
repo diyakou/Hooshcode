@@ -239,6 +239,7 @@ jobs:
         run: cargo build --target x86_64-pc-windows-msvc
         env:
           CARGO_INCREMENTAL: "0"
+          LIBCLANG_PATH: C:\Program Files\LLVM\bin
 
   rust-msrv:
     name: Check MSRV
