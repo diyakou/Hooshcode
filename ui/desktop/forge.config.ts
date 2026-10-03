@@ -136,7 +136,7 @@ module.exports = {
       platforms: ['linux'],
       config: {
         options: {
-          id: 'ir.houshiar-ai.houshiarcode',
+          id: 'ir.houshiar_ai.houshiarcode',
           icon: 'src/images/icon.png',
           categories: ['Development'],
           runtimeVersion: '24.08',
