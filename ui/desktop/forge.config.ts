@@ -143,6 +143,19 @@ module.exports = {
           baseVersion: '24.08',
           branch: 'stable',
           files: [],
+          modules: [
+            {
+              name: 'zypak',
+              makeArgs: ['CXX=g++'],
+              sources: [
+                {
+                  type: 'git',
+                  url: 'https://github.com/refi64/zypak',
+                  tag: 'v2021.02',
+                },
+              ],
+            },
+          ],
         },
       },
     },
