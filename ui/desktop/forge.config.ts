@@ -146,7 +146,7 @@ module.exports = {
           modules: [
             {
               name: 'zypak',
-              makeArgs: ['CXX=g++'],
+              'make-args': ['CXX=g++'],
               sources: [
                 {
                   type: 'git',
