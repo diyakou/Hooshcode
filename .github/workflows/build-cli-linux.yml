@@ -366,6 +366,7 @@ jobs:
 
       - name: Build Linux packages
         env:
+          DEBUG: electron-installer-flatpak*,@malept/flatpak-bundler*
           ELECTRON_ARCH: ${{ matrix.electron_arch }}
           FLATPAK_ARCH: ${{ matrix.flatpak_arch }}
           GOOSE_DESKTOP_LINUX_VARIANT: ${{ matrix.variant }}
