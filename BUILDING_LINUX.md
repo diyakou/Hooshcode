@@ -167,6 +167,9 @@ sudo apt install flatpak flatpak-builder
 # Add Flathub remote
 flatpak remote-add --if-not-exists --user flathub https://dl.flathub.org/repo/flathub.flatpakrepo
 
+# Allow file protocol for flatpak-builder git submodules (required for Git 2.38+)
+git config --global protocol.file.allow always
+
 # Build with Electron Forge
 pnpm run make --targets=@electron-forge/maker-flatpak
 ```
