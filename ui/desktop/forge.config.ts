@@ -146,12 +146,12 @@ module.exports = {
           modules: [
             {
               name: 'zypak',
-              'make-args': ['CXX=g++'],
               sources: [
                 {
                   type: 'git',
                   url: 'https://github.com/refi64/zypak',
-                  tag: 'v2021.02',
+                  tag: 'v2025.09',
+                  commit: '693a71c5ffa80ec9c9ce2ae03b1ccc493c698e53',
                 },
               ],
             },
