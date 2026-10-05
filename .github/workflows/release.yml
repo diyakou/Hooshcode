@@ -1,3 +1,4 @@
+# Release v1.51.2 trigger
 # This workflow builds release artifacts for release branches and publishes tagged releases.
 on:
   workflow_dispatch:
