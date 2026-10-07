@@ -16,10 +16,11 @@ import {
   acpListProviderSecrets,
   acpSaveDefaults,
   acpSaveProviderConfig,
+  acpSetSessionProviderModel,
   type ProviderSecretDto,
 } from '../../../acp/providers';
 import { errorMessage } from '../../../utils/conversionUtils';
-import { acpUpsertConfig } from '../../../acp/config';
+import { useChatContext } from '../../../contexts/ChatContext';
 import { useModelAndProvider } from '../../ModelAndProviderContext';
 import { Button } from '../../ui/button';
 import { Input } from '../../ui/input';
@@ -140,6 +141,7 @@ function expiryClass(secret: ProviderSecretDto) {
 
 export default function AuthSettingsSection() {
   const intl = useIntl();
+  const chatContext = useChatContext();
   const { currentProvider, refreshCurrentModelAndProvider } = useModelAndProvider();
   const [secrets, setSecrets] = useState<ProviderSecretDto[]>([]);
   const [loading, setLoading] = useState(true);
@@ -151,6 +153,7 @@ export default function AuthSettingsSection() {
   const [isEditingKey, setIsEditingKey] = useState(false);
   const [isSavingKey, setIsSavingKey] = useState(false);
   const [keyError, setKeyError] = useState<string | null>(null);
+  const [houshiarCredentialRevision, setHoushiarCredentialRevision] = useState(0);
 
   const loadSecrets = useCallback(async () => {
     setLoading(true);
@@ -217,35 +220,15 @@ export default function AuthSettingsSection() {
         ? 'claude-sonnet-5'
         : models[0] || 'claude-sonnet-5';
 
-      // Direct secret persistence for both key variants
-      await acpUpsertConfig('HOUSHIAR_API_KEY', trimmedKey, true);
-      await acpUpsertConfig('CUSTOM_HOUSHIAR_API_KEY', trimmedKey, true);
-
-      try {
-        await acpSaveProviderConfig('houshiar', [{ key: 'HOUSHIAR_API_KEY', value: trimmedKey }]);
-      } catch {
-        try {
-          await acpSaveProviderConfig('custom_houshiar', [
-            { key: 'CUSTOM_HOUSHIAR_API_KEY', value: trimmedKey },
-          ]);
-        } catch {}
+      await acpSaveProviderConfig('houshiar', [{ key: 'HOUSHIAR_API_KEY', value: trimmedKey }]);
+      await acpSaveDefaults('houshiar', defaultModel);
+      if (chatContext?.chat.sessionId) {
+        await acpSetSessionProviderModel(chatContext.chat.sessionId, 'houshiar', defaultModel);
       }
-
-      try {
-        await acpSaveDefaults('houshiar', defaultModel);
-      } catch {
-        try {
-          await acpSaveDefaults('custom_houshiar', defaultModel);
-        } catch {}
-      }
-
-      try {
-        await acpUpsertConfig('GOOSE_PROVIDER', 'houshiar', false);
-        await acpUpsertConfig('GOOSE_MODEL', 'claude-sonnet-5', false);
-      } catch {}
 
       await refreshCurrentModelAndProvider();
       await loadSecrets();
+      setHoushiarCredentialRevision((revision) => revision + 1);
 
       toast.success('کلید API هوشیار با موفقیت ذخیره شد');
       setIsEditingKey(false);
@@ -419,7 +402,7 @@ export default function AuthSettingsSection() {
       </Card>
 
       {/* Houshiar Usage, Plan, and Token Metrics Dashboard */}
-      <HoushiarUsageSection />
+      <HoushiarUsageSection credentialRevision={houshiarCredentialRevision} />
 
       <Card className="pb-2">
         <CardHeader className="pb-0">

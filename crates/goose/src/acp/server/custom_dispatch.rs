@@ -919,13 +919,9 @@ impl GooseAcpAgent {
         &self,
     ) -> Result<serde_json::Value, agent_client_protocol::Error> {
         let config = self.config()?;
-        let api_key: String = config
-            .get_secret("HOUSHIAR_API_KEY")
-            .or_else(|_| config.get_secret("CUSTOM_HOUSHIAR_API_KEY"))
-            .map_err(|_| {
-                agent_client_protocol::Error::invalid_params()
-                    .data("کلید API هوشیار تنظیم نشده است")
-            })?;
+        let api_key = crate::providers::houshiar_def::houshiar_api_key(config).map_err(|_| {
+            agent_client_protocol::Error::invalid_params().data("کلید API هوشیار تنظیم نشده است")
+        })?;
 
         let client = reqwest::Client::builder()
             .timeout(std::time::Duration::from_secs(10))

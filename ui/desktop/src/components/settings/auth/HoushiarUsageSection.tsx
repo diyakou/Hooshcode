@@ -19,9 +19,13 @@ import { useIntl } from '../../../i18n';
 
 interface HoushiarUsageSectionProps {
   apiKey?: string;
+  credentialRevision?: number;
 }
 
-export default function HoushiarUsageSection({ apiKey }: HoushiarUsageSectionProps) {
+export default function HoushiarUsageSection({
+  apiKey,
+  credentialRevision,
+}: HoushiarUsageSectionProps) {
   const intl = useIntl();
   const isPersian = intl.locale.startsWith('fa');
   const [usage, setUsage] = useState<HoushiarUsageData | null>(null);
@@ -49,7 +53,7 @@ export default function HoushiarUsageSection({ apiKey }: HoushiarUsageSectionPro
 
   useEffect(() => {
     fetchUsage(apiKey);
-  }, [fetchUsage, apiKey]);
+  }, [fetchUsage, apiKey, credentialRevision]);
 
   // Calculations for display
   const tokensToday = usage?.billing?.tokens_used_today ?? usage?.used_today ?? 0;

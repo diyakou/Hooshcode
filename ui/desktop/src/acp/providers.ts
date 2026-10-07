@@ -277,7 +277,8 @@ export async function acpSaveProviderConfig(
   fields: { key: string; value: string }[]
 ): Promise<void> {
   const client = await getAcpClient();
-  await client.goose.providersConfigSave_unstable({ providerId, fields });
+  const { refresh } = await client.goose.providersConfigSave_unstable({ providerId, fields });
+  await waitForProviderInventoryRefresh(client, providerId, refresh);
 }
 
 export async function acpEnableProvider(

@@ -17,6 +17,25 @@ pub const HOUSHIAR_BASE_URL: &str = "https://wqai.morvism.ir";
 pub const HOUSHIAR_API_VERSION: &str = "2023-06-01";
 pub const HOUSHIAR_CLIENT_BRAND: &str = "houshiar-code";
 
+pub(crate) fn houshiar_api_key(config: &Config) -> Result<String> {
+    let stored_key = config.all_secrets().ok().and_then(|secrets| {
+        ["HOUSHIAR_API_KEY", "CUSTOM_HOUSHIAR_API_KEY"]
+            .into_iter()
+            .find_map(|key| secrets.get(key).and_then(|value| value.as_str()))
+            .map(str::to_owned)
+    });
+
+    stored_key.map_or_else(
+        || {
+            config
+                .get_secret("HOUSHIAR_API_KEY")
+                .or_else(|_| config.get_secret("CUSTOM_HOUSHIAR_API_KEY"))
+                .map_err(Into::into)
+        },
+        Ok,
+    )
+}
+
 pub struct HoushiarProviderDef;
 
 impl ProviderDescriptor for HoushiarProviderDef {
@@ -57,9 +76,7 @@ async fn from_env(
     tls_config: Option<crate::providers::api_client::TlsConfig>,
 ) -> Result<AnthropicProvider> {
     let config = Config::global();
-    let api_key: String = config
-        .get_secret("HOUSHIAR_API_KEY")
-        .or_else(|_| config.get_secret("CUSTOM_HOUSHIAR_API_KEY"))?;
+    let api_key = houshiar_api_key(config)?;
     let host = HOUSHIAR_BASE_URL.to_string();
     let timeout_secs = crate::providers::base::DEFAULT_PROVIDER_TIMEOUT_SECS;
 
