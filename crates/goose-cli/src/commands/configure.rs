@@ -371,7 +371,194 @@ async fn handle_first_time_setup(config: &Config) -> anyhow::Result<()> {
     println!();
     cliclack::intro(style(" houshiar-configure ").on_cyan().black())?;
 
-    configure_houshiar_dialog(config).await
+    let setup_method = cliclack::select("How would you like to set up your provider?")
+        .item(
+            "houshiar",
+            "Houshiar Login (Recommended)",
+            "Configure Houshiar Code with your API key",
+        )
+        .item(
+            "openrouter",
+            "OpenRouter Login (Recommended)",
+            "Sign in with OpenRouter to automatically configure models",
+        )
+        .item(
+            "tetrate",
+            "Tetrate Agent Router Service Login",
+            "Sign in with Tetrate Agent Router Service to automatically configure models",
+        )
+        .item(
+            "manual",
+            "Manual Configuration",
+            "Choose a provider and enter credentials manually",
+        )
+        .interact()?;
+
+    match setup_method {
+        "houshiar" => {
+            if let Err(e) = configure_houshiar_dialog(config).await {
+                let _ = config.clear();
+                println!(
+                    "\n  {} Houshiar authentication failed: {} \n  Please try again or use another provider",
+                    style("Error").red().italic(),
+                    e,
+                );
+            }
+        }
+        "openrouter" => {
+            if let Err(e) = handle_openrouter_auth().await {
+                let _ = config.clear();
+                println!(
+                    "\n  {} OpenRouter authentication failed: {} \n  Please try again or use manual configuration",
+                    style("Error").red().italic(),
+                    e,
+                );
+            }
+        }
+        "tetrate" => {
+            if let Err(e) = handle_tetrate_auth().await {
+                let _ = config.clear();
+                println!(
+                    "\n  {} Tetrate Agent Router Service authentication failed: {} \n  Please try again or use manual configuration",
+                    style("Error").red().italic(),
+                    e,
+                );
+            }
+        }
+        "manual" => handle_manual_provider_setup(config).await,
+        _ => unreachable!(),
+    }
+
+    if config.exists() {
+        configure_first_time_goose_mode(config, select_goose_mode)?;
+    }
+    Ok(())
+}
+
+fn configure_first_time_goose_mode(
+    config: &Config,
+    select: impl FnOnce() -> anyhow::Result<GooseMode>,
+) -> anyhow::Result<()> {
+    if !matches!(config.get_goose_mode(), Err(ConfigError::NotFound(_))) {
+        return Ok(());
+    }
+
+    println!();
+    cliclack::intro(style(" goose-mode ").on_cyan().black())?;
+    let _ = cliclack::log::info(
+        "goose mode controls whether goose uses tools freely or asks for your approval first.\n\
+         Auto is the default. You can change it later in 'goose configure' > goose settings.",
+    );
+    let mode = select()?;
+    config.set_goose_mode(mode)?;
+    cliclack::outro(goose_mode_saved_message(mode))?;
+    Ok(())
+}
+
+async fn handle_manual_provider_setup(config: &Config) {
+    match configure_provider_dialog().await {
+        Ok(true) => {
+            println!(
+                "\n  {}: Run '{}' again to adjust your config or add extensions",
+                style("Tip").green().italic(),
+                style("goose configure").cyan()
+            );
+            set_extension(ExtensionEntry {
+                enabled: true,
+                config: ExtensionConfig::default(),
+            });
+        }
+        Ok(false) => {
+            let _ = config.clear();
+            println!(
+                "\n  {}: We did not save your config, inspect your credentials\n   and run '{}' again to ensure goose can connect",
+                style("Warning").yellow().italic(),
+                style("goose configure").cyan()
+            );
+        }
+        Err(e) => {
+            let _ = config.clear();
+            print_manual_config_error(&e);
+        }
+    }
+}
+
+fn print_manual_config_error(e: &anyhow::Error) {
+    match e.downcast_ref::<ConfigError>() {
+        Some(ConfigError::NotFound(key)) => {
+            println!(
+                "\n  {} Required configuration key '{}' not found \n  Please provide this value and run '{}' again",
+                style("Error").red().italic(),
+                key,
+                style("goose configure").cyan()
+            );
+        }
+        Some(ConfigError::KeyringError(msg)) => {
+            print_keyring_error(msg);
+        }
+        Some(ConfigError::DeserializeError(msg)) => {
+            println!(
+                "\n  {} Invalid configuration value: {} \n  Please check your input and run '{}' again",
+                style("Error").red().italic(),
+                msg,
+                style("goose configure").cyan()
+            );
+        }
+        Some(ConfigError::FileError(err)) => {
+            println!(
+                "\n  {} Failed to access config file: {} \n  Please check file permissions and run '{}' again",
+                style("Error").red().italic(),
+                err,
+                style("goose configure").cyan()
+            );
+        }
+        Some(ConfigError::DirectoryError(msg)) => {
+            println!(
+                "\n  {} Failed to access config directory: {} \n  Please check directory permissions and run '{}' again",
+                style("Error").red().italic(),
+                msg,
+                style("goose configure").cyan()
+            );
+        }
+        _ => {
+            println!(
+                "\n  {} {} \n  We did not save your config, inspect your credentials\n   and run '{}' again to ensure goose can connect",
+                style("Error").red().italic(),
+                e,
+                style("goose configure").cyan()
+            );
+        }
+    }
+}
+
+#[cfg(target_os = "macos")]
+fn print_keyring_error(msg: &str) {
+    println!(
+        "\n  {} Failed to access secure storage (keyring): {} \n  Please check your system keychain and run '{}' again. \n  If your system is unable to use the keyring, please try setting secret key(s) via environment variables.",
+        style("Error").red().italic(),
+        msg,
+        style("goose configure").cyan()
+    );
+}
+
+#[cfg(target_os = "windows")]
+fn print_keyring_error(msg: &str) {
+    println!(
+        "\n  {} Failed to access Windows Credential Manager: {} \n  Please check Windows Credential Manager and run '{}' again. \n  If your system is unable to use the Credential Manager, please try setting secret key(s) via environment variables.",
+        style("Error").red().italic(),
+        msg,
+        style("goose configure").cyan()
+    );
+}
+
+#[cfg(not(any(target_os = "macos", target_os = "windows")))]
+fn print_keyring_error(msg: &str) {
+    println!(
+        "\n  {} Failed to access secure storage: {} \n  Please check your system's secure storage and run '{}' again. \n  If your system is unable to use secure storage, please try setting secret key(s) via environment variables.",
+        style("Error").red().italic(),
+        msg,
+        style("goose configure").cyan()
+    );
 }
 
 async fn handle_existing_config() -> anyhow::Result<()> {
@@ -1503,7 +1690,15 @@ pub fn configure_goose_mode_dialog() -> anyhow::Result<()> {
         );
     }
 
+    let mode = select_goose_mode()?;
+    config.set_goose_mode(mode)?;
+    cliclack::outro(goose_mode_saved_message(mode))?;
+    Ok(())
+}
+
+fn select_goose_mode() -> anyhow::Result<GooseMode> {
     let mode = cliclack::select("Which goose mode would you like to configure?")
+        .initial_value(GooseMode::Auto)
         .item(
             GooseMode::Auto,
             "Auto Mode",
@@ -1525,16 +1720,16 @@ pub fn configure_goose_mode_dialog() -> anyhow::Result<()> {
             "Engage with the selected provider without using tools, extensions, or file modification"
         )
         .interact()?;
+    Ok(mode)
+}
 
-    config.set_goose_mode(mode)?;
-    let msg = match mode {
+fn goose_mode_saved_message(mode: GooseMode) -> &'static str {
+    match mode {
         GooseMode::Auto => "Set to Auto Mode - full file modification enabled",
         GooseMode::Approve => "Set to Approve Mode - all tools and modifications require approval",
         GooseMode::SmartApprove => "Set to Smart Approve Mode - modifications require approval",
         GooseMode::Chat => "Set to Chat Mode - no tools or modifications enabled",
-    };
-    cliclack::outro(msg)?;
-    Ok(())
+    }
 }
 
 #[cfg(feature = "telemetry")]
@@ -2383,6 +2578,56 @@ fn print_config_file_saved() -> anyhow::Result<()> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use tempfile::TempDir;
+
+    fn test_config(temp_dir: &TempDir) -> Config {
+        Config::new_with_file_secrets(
+            temp_dir.path().join("config.yaml"),
+            temp_dir.path().join("secrets.yaml"),
+        )
+        .unwrap()
+    }
+
+    fn no_prompt() -> anyhow::Result<GooseMode> {
+        panic!("goose mode prompt should not be shown");
+    }
+
+    #[test]
+    fn first_time_goose_mode_prompts_and_persists_selection() {
+        let _guard = env_lock::lock_env([("GOOSE_MODE", None::<&str>)]);
+        let temp_dir = TempDir::new().unwrap();
+        let config = test_config(&temp_dir);
+
+        configure_first_time_goose_mode(&config, || Ok(GooseMode::Approve)).unwrap();
+
+        assert_eq!(
+            test_config(&temp_dir).get_goose_mode().unwrap(),
+            GooseMode::Approve
+        );
+    }
+
+    #[test]
+    fn first_time_goose_mode_skips_when_set_in_env() {
+        let _guard = env_lock::lock_env([("GOOSE_MODE", Some("chat"))]);
+        let temp_dir = TempDir::new().unwrap();
+        let config = test_config(&temp_dir);
+
+        configure_first_time_goose_mode(&config, no_prompt).unwrap();
+
+        assert!(!temp_dir.path().join("config.yaml").exists());
+    }
+
+    #[test]
+    fn first_time_goose_mode_keeps_existing_config_value() {
+        let _guard = env_lock::lock_env([("GOOSE_MODE", None::<&str>)]);
+        let temp_dir = TempDir::new().unwrap();
+        let config = test_config(&temp_dir);
+        config.set_goose_mode(GooseMode::SmartApprove).unwrap();
+
+        configure_first_time_goose_mode(&config, no_prompt).unwrap();
+
+        assert_eq!(config.get_goose_mode().unwrap(), GooseMode::SmartApprove);
+    }
 
     #[test]
     fn selected_item_inside_visible_window_keeps_order() {

@@ -1983,13 +1983,16 @@
     "defaultMessage": "Invalid URL"
   },
   "mcpAppRenderer.movePipWindow": {
-    "defaultMessage": "Move Picture-in-Picture window (use arrow keys)"
+    "defaultMessage": "Move Picture-in-Picture window"
   },
   "mcpAppRenderer.pictureInPicture": {
     "defaultMessage": "Picture-in-Picture"
   },
   "mcpAppRenderer.playingInPip": {
     "defaultMessage": "Playing in Picture-in-Picture"
+  },
+  "mcpAppRenderer.resizePipWindow": {
+    "defaultMessage": "Resize Picture-in-Picture window"
   },
   "mentionPopover.itemsFound": {
     "defaultMessage": "{count,plural,one{# item found} other{# items found}}"
@@ -2401,6 +2404,9 @@
   },
   "navigationPanel.chats": {
     "defaultMessage": "Chats"
+  },
+  "navigationPanel.loadingChats": {
+    "defaultMessage": "Loading chats…"
   },
   "navigationPanel.metaCreated": {
     "defaultMessage": "Created"
@@ -3863,9 +3869,6 @@
   "sessions.action.openNewWindow": {
     "defaultMessage": "Open in new window"
   },
-  "sessions.action.shareNostr": {
-    "defaultMessage": "Share encrypted Nostr link"
-  },
   "sessions.cancel": {
     "defaultMessage": "Cancel"
   },
@@ -3905,21 +3908,6 @@
   "sessions.import": {
     "defaultMessage": "Import Session"
   },
-  "sessions.importNostr": {
-    "defaultMessage": "Import Link"
-  },
-  "sessions.importNostr.description": {
-    "defaultMessage": "Paste a Houshiar Code Nostr share link to fetch, decrypt, and import the session."
-  },
-  "sessions.importNostr.placeholder": {
-    "defaultMessage": "goose://sessions/nostr?nevent=...&key=..."
-  },
-  "sessions.importNostr.title": {
-    "defaultMessage": "Import Nostr Session"
-  },
-  "sessions.importing": {
-    "defaultMessage": "Importing..."
-  },
   "sessions.includeAcp": {
     "defaultMessage": "Include ACP sessions"
   },
@@ -3947,12 +3935,6 @@
   "sessions.searchPlaceholder": {
     "defaultMessage": "Search history..."
   },
-  "sessions.shareNostr.description": {
-    "defaultMessage": "Anyone with this link can fetch and decrypt the session. Treat it like a secret."
-  },
-  "sessions.shareNostr.title": {
-    "defaultMessage": "Encrypted Nostr Share Link"
-  },
   "sessions.toast.copied": {
     "defaultMessage": "Copied to clipboard"
   },
@@ -3979,12 +3961,6 @@
   },
   "sessions.toast.imported": {
     "defaultMessage": "Session imported successfully"
-  },
-  "sessions.toast.shareNostr": {
-    "defaultMessage": "Encrypted Nostr share link created"
-  },
-  "sessions.toast.shareNostrFailed": {
-    "defaultMessage": "Failed to create Nostr share link: {error}"
   },
   "sessions.toast.updateFailed": {
     "defaultMessage": "Failed to update session description: {error}"

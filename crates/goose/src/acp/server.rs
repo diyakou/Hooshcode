@@ -59,6 +59,7 @@ use agent_client_protocol::schema::v1::{
     SetSessionModeResponse, StopReason, TextContent, ToolCallId, ToolCallUpdate, Usage,
     UsageUpdate,
 };
+use agent_client_protocol::schema::ProtocolVersion;
 use agent_client_protocol::util::MatchDispatchFrom;
 use agent_client_protocol::{
     Agent as SacpAgent, ByteStreams, Client, ConnectionTo, Dispatch, HandleDispatchFrom, Handled,
@@ -580,15 +581,21 @@ fn initial_session_extensions(
     goose_extensions: Option<Vec<GooseExtension>>,
     recipe_extensions: Option<&[ExtensionConfig]>,
 ) -> Result<Vec<ExtensionConfig>, agent_client_protocol::Error> {
+    // A selection the client sends is the whole session: an empty list starts no
+    // extensions, and `[memory]` starts Memory without the default built-ins.
+    if let (None, Some(goose_extensions)) = (recipe_extensions, goose_extensions) {
+        let mut selected = Vec::new();
+        for extension in extensions::goose_extensions_to_configs(goose_extensions)? {
+            push_or_replace_extension(&mut selected, extension);
+        }
+        return Ok(selected);
+    }
+
     let mut extensions = selected_builtin_extensions(config, builtin_selection);
 
     if let Some(recipe_extensions) = recipe_extensions {
         for extension in recipe_extensions {
             push_or_replace_extension(&mut extensions, extension.clone());
-        }
-    } else if let Some(goose_extensions) = goose_extensions {
-        for extension in extensions::goose_extensions_to_configs(goose_extensions)? {
-            push_or_replace_extension(&mut extensions, extension);
         }
     } else {
         for extension in get_enabled_extensions_with_config(config) {
@@ -944,7 +951,6 @@ impl GooseAcpAgent {
             .unwrap_or(false)
     }
 
-    // TODO: goose reads Paths::in_state_dir globally (e.g. RequestLog), ignoring this data_dir.
     pub async fn new(options: GooseAcpAgentOptions) -> Result<Self> {
         let session_manager = Arc::new(SessionManager::new(options.data_dir));
 
@@ -1136,7 +1142,7 @@ impl GooseAcpAgent {
 
         agent
             .extension_manager
-            .add_client("developer".into(), developer_config, client, info)
+            .add_client(developer_config, client, info)
             .await;
     }
 
@@ -1838,7 +1844,7 @@ impl GooseAcpAgent {
             )
             .mcp_capabilities(McpCapabilities::new().http(true))
             .meta(agent_capabilities_meta());
-        Ok(InitializeResponse::new(args.protocol_version)
+        Ok(InitializeResponse::new(ProtocolVersion::LATEST)
             .agent_info(Implementation::new("goose", env!("CARGO_PKG_VERSION")))
             .agent_capabilities(capabilities)
             .auth_methods(vec![AuthMethod::Agent(
@@ -2238,6 +2244,8 @@ impl GooseAcpAgent {
 
         if cancel_token.is_cancelled() {
             was_cancelled = true;
+            drop(stream);
+            agent.cancel_foreground_subagents(session_id).await;
         }
 
         if !was_cancelled {
@@ -2713,7 +2721,6 @@ pub async fn run(builtins: Vec<String>, enable_scheduler: bool) -> Result<()> {
     let server = crate::acp::server_factory::AcpServer::new(
         crate::acp::server_factory::AcpServerFactoryConfig {
             builtins: AcpBuiltinSelection::from_requested(builtins),
-            data_dir: Paths::data_dir(),
             config_dir: Paths::config_dir(),
             goose_platform: GoosePlatform::GooseCli,
             additional_source_roots: Vec::new(),
@@ -2956,6 +2963,124 @@ extensions:
         assert!(extensions
             .iter()
             .any(|extension| extension.name() == "zed-mcp"));
+    }
+
+    fn requested_builtin(name: &str) -> GooseExtension {
+        GooseExtension::Builtin {
+            name: name.to_string(),
+            description: None,
+            display_name: None,
+            timeout: None,
+            bundled: None,
+            available_tools: None,
+        }
+    }
+
+    fn developer_enabled_config() -> (Config, NamedTempFile, NamedTempFile) {
+        config_with_yaml(
+            r#"
+extensions:
+  developer:
+    enabled: true
+    type: builtin
+    name: developer
+"#,
+        )
+    }
+
+    #[test]
+    fn client_selection_replaces_the_builtins() {
+        let (config, _c, _s) = developer_enabled_config();
+        let project_root = tempfile::tempdir().unwrap();
+
+        for selection in [default_builtin("developer"), explicit_builtin("developer")] {
+            let extensions = initial_session_extensions(
+                &config,
+                &selection,
+                project_root.path(),
+                vec![],
+                Some(vec![requested_builtin("memory")]),
+                None,
+            )
+            .unwrap();
+
+            let names: Vec<String> = extensions.iter().map(ExtensionConfig::name).collect();
+            assert_eq!(names, vec!["memory".to_string()]);
+        }
+    }
+
+    #[test]
+    fn empty_client_selection_starts_no_extensions() {
+        let (config, _c, _s) = developer_enabled_config();
+        let project_root = tempfile::tempdir().unwrap();
+
+        let extensions = initial_session_extensions(
+            &config,
+            &default_builtin("developer"),
+            project_root.path(),
+            vec![],
+            Some(vec![]),
+            None,
+        )
+        .unwrap();
+
+        assert!(extensions.is_empty());
+    }
+
+    #[test]
+    fn client_selection_ignores_configured_extensions_and_request_mcp_servers() {
+        let (config, _c, _s) = config_with_yaml(
+            r#"
+extensions:
+  developer:
+    enabled: true
+    type: builtin
+    name: developer
+  computercontroller:
+    enabled: true
+    type: builtin
+    name: computercontroller
+"#,
+        );
+        let project_root = tempfile::tempdir().unwrap();
+
+        let extensions = initial_session_extensions(
+            &config,
+            &default_builtin("developer"),
+            project_root.path(),
+            vec![McpServer::Http(McpServerHttp::new(
+                "zed-mcp",
+                "http://localhost/mcp",
+            ))],
+            Some(vec![requested_builtin("memory")]),
+            None,
+        )
+        .unwrap();
+
+        let names: Vec<String> = extensions.iter().map(ExtensionConfig::name).collect();
+        assert_eq!(names, vec!["memory".to_string()]);
+    }
+
+    #[test]
+    fn recipe_extensions_still_load_with_the_builtins() {
+        let (config, _c, _s) = developer_enabled_config();
+        let project_root = tempfile::tempdir().unwrap();
+        let recipe_extensions = vec![builtin_to_extension_config("memory")];
+
+        let extensions = initial_session_extensions(
+            &config,
+            &default_builtin("developer"),
+            project_root.path(),
+            vec![],
+            Some(vec![]),
+            Some(&recipe_extensions),
+        )
+        .unwrap();
+
+        assert!(has_developer(&extensions));
+        assert!(extensions
+            .iter()
+            .any(|extension| extension.name() == "memory"));
     }
 
     #[test]
@@ -3272,11 +3397,12 @@ print(\"hello, world\")
             .unwrap();
 
         assert_eq!(empty_audience_content.len(), 2);
-        assert!(empty_audience_content.iter().all(|text| text
-            .annotations
-            .as_ref()
-            .and_then(|annotations| annotations.audience.as_ref())
-            .is_some_and(Vec::is_empty)));
+        assert!(empty_audience_content.iter().all(|text| {
+            text.annotations
+                .as_ref()
+                .and_then(|annotations| annotations.audience.as_ref())
+                .is_some_and(Vec::is_empty)
+        }));
         assert!(audience_omitted_content.annotations.is_none());
         assert!(user_content.as_concat_text().contains("visible text"));
         assert!(user_content
@@ -3524,6 +3650,55 @@ print(\"hello, world\")
                 .and_then(|meta| meta.get("goose").cloned())
                 .and_then(|goose| goose.get("recipeParameterScopes").cloned()),
             Some(serde_json::json!({}))
+        );
+    }
+
+    #[tokio::test]
+    async fn initialize_stamps_the_protocol_version_goose_implements() {
+        let root = tempfile::tempdir().unwrap();
+        let active_runs = Arc::new(ActiveRunRegistry::default());
+        let live_voice = Arc::new(LiveVoiceService::from_config(active_runs.clone()));
+        let provider_factory: AcpProviderFactory = Arc::new(
+            |_provider_name, _extensions, _working_dir, _use_default_model| {
+                Box::pin(async { Err(anyhow::anyhow!("unused provider factory")) })
+            },
+        );
+        let agent = GooseAcpAgent::new(GooseAcpAgentOptions {
+            provider_factory,
+            builtin_selection: AcpBuiltinSelection::default(),
+            data_dir: root.path().to_path_buf(),
+            config_dir: root.path().to_path_buf(),
+            disable_session_naming: true,
+            goose_platform: GoosePlatform::GooseCli,
+            additional_source_roots: Vec::new(),
+            scheduler: None,
+            session_cwd: None,
+            active_runs,
+            live_voice,
+        })
+        .await
+        .unwrap();
+
+        let offered_v2 = agent_client_protocol::schema::ProtocolVersion::from(2u16);
+        let response = agent
+            .on_initialize(InitializeRequest::new(offered_v2))
+            .await
+            .unwrap();
+        assert_eq!(
+            response.protocol_version,
+            agent_client_protocol::schema::ProtocolVersion::V1,
+            "goose implements ACP v1 and must stamp v1 even when the client offers v2"
+        );
+
+        let response = agent
+            .on_initialize(InitializeRequest::new(
+                agent_client_protocol::schema::ProtocolVersion::V1,
+            ))
+            .await
+            .unwrap();
+        assert_eq!(
+            response.protocol_version,
+            agent_client_protocol::schema::ProtocolVersion::V1
         );
     }
 

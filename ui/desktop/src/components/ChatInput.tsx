@@ -209,6 +209,8 @@ interface ChatInputProps {
   nextChatExtensionDraft?: NextChatExtensionDraft;
   onNextChatExtensionDraftChange?: (draft: NextChatExtensionDraft) => void;
   liveVoice?: ChatInputLiveVoice;
+  appendQuote?: string | null;
+  onAppendQuoteConsumed?: () => void;
 }
 
 export default function ChatInput({
@@ -247,6 +249,8 @@ export default function ChatInput({
   nextChatExtensionDraft,
   onNextChatExtensionDraftChange,
   liveVoice,
+  appendQuote,
+  onAppendQuoteConsumed,
 }: ChatInputProps) {
   const [_value, setValue] = useState(initialValue);
   const [displayValue, setDisplayValue] = useState(initialValue); // For immediate visual feedback
@@ -574,6 +578,17 @@ export default function ChatInput({
       }, 0);
     }
   }, [initialPrompt, messages.length, textAreaRef]);
+
+  useEffect(() => {
+    if (!appendQuote) return;
+    const blockquote = appendQuote
+      .split('\n')
+      .map((line) => `> ${line}`)
+      .join('\n');
+    applyInputValue((_value ? _value + '\n\n' : '') + blockquote + '\n\n');
+    setTimeout(() => textAreaRef.current?.focus(), 0);
+    onAppendQuoteConsumed?.();
+  }, [appendQuote]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const [isComposing, setIsComposing] = useState(false);
   const [historyIndex, setHistoryIndex] = useState(-1);
