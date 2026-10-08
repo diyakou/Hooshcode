@@ -194,7 +194,7 @@ jobs:
     name: Package Desktop (macOS)
     if: ${{ inputs.package_desktop }}
     needs: build-goose
-    runs-on: ${{ inputs.target == 'x86_64-apple-darwin' && 'macos-15-intel' || 'macos-latest' }}
+    runs-on: ${{ inputs.target == 'x86_64-apple-darwin' && 'macos-15-intel' || 'macos-15' }}
     environment: ${{ inputs.environment || '' }}
     env:
       MACOSX_DEPLOYMENT_TARGET: "12.0"
