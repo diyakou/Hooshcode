@@ -84,11 +84,7 @@ function getProviders(): ProviderConfig[] {
     },
     {
       provider: 'google',
-      models: [
-        'gemini-3.5-flash',
-        'gemini-3.5-flash-lite',
-        'gemini-3.6-flash',
-      ],
+      models: ['gemini-3.5-flash', 'gemini-3.5-flash-lite', 'gemini-3.6-flash'],
       available: () => hasEnv('GOOGLE_API_KEY'),
     },
     {
@@ -155,7 +151,7 @@ function getProviders(): ProviderConfig[] {
       provider: 'claude-code',
       models: ['default'],
       agentic: true,
-      available: () => hasCmd('claude'),
+      available: () => hasCmd('claude') && hasEnv('ANTHROPIC_API_KEY'),
     },
     {
       provider: 'cursor-agent',
