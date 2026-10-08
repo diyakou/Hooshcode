@@ -16,6 +16,7 @@ import type { HoushiarUsageData } from '../../../types/houshiar';
 import { Button } from '../../ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../ui/card';
 import { useIntl } from '../../../i18n';
+import { errorMessage } from '../../../utils/conversionUtils';
 
 interface HoushiarUsageSectionProps {
   apiKey?: string;
@@ -39,10 +40,11 @@ export default function HoushiarUsageSection({
       try {
         const data = await acpGetHoushiarUsage(key);
         setUsage(data);
-      } catch (err: any) {
-        const msg =
-          err?.message ||
-          (isPersian ? 'دریافت آمار مصرف با خطا مواجه شد' : 'Failed to fetch usage metrics');
+      } catch (err) {
+        const msg = errorMessage(
+          err,
+          isPersian ? 'دریافت آمار مصرف با خطا مواجه شد' : 'Failed to fetch usage metrics'
+        );
         setError(msg);
       } finally {
         setLoading(false);

@@ -76,7 +76,9 @@ export async function fetchModelsForProviders(
             );
             return { provider: p, models, error: null, warning: null };
           }
-        } catch {}
+        } catch (error) {
+          console.warn(`Could not read cached Houshiar models for ${p.name}:`, error);
+        }
       }
 
       const providerModels = await acpListProviderModels(p.name);

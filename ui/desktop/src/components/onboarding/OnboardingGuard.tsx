@@ -13,6 +13,7 @@ import { Goose } from '../icons';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { defineMessages, useIntl } from '../../i18n';
+import { errorMessage } from '../../utils/conversionUtils';
 
 const i18n = defineMessages({
   checkProviderErrorTitle: {
@@ -59,7 +60,9 @@ export default function OnboardingGuard({ children }: OnboardingGuardProps) {
           if (secrets.some((s) => s.provider?.toLowerCase().includes('houshiar') && s.hasSecret)) {
             isConfigured = true;
           }
-        } catch {}
+        } catch (error) {
+          console.warn('Could not check Houshiar credentials:', error);
+        }
 
         if (!isConfigured) {
           try {
@@ -67,7 +70,9 @@ export default function OnboardingGuard({ children }: OnboardingGuardProps) {
             if (houshiar?.is_configured) {
               isConfigured = true;
             }
-          } catch {}
+          } catch (error) {
+            console.warn('Could not read Houshiar provider configuration:', error);
+          }
         }
 
         if (isConfigured) {
@@ -126,11 +131,28 @@ export default function OnboardingGuard({ children }: OnboardingGuardProps) {
         });
 
         if (response.ok) {
-          const data = await response.json();
-          const arr = Array.isArray(data) ? data : data.data || data.models || [];
-          models = arr
-            .map((m: any) => (typeof m === 'string' ? m : m.id || m.name))
-            .filter(Boolean);
+          const data: unknown = await response.json();
+          const responseData =
+            typeof data === 'object' && data !== null
+              ? (data as { data?: unknown; models?: unknown })
+              : {};
+          const modelsResponse = Array.isArray(data)
+            ? data
+            : Array.isArray(responseData.data)
+              ? responseData.data
+              : Array.isArray(responseData.models)
+                ? responseData.models
+                : [];
+          models = modelsResponse.flatMap((model: unknown) => {
+            if (typeof model === 'string') return [model];
+            if (typeof model !== 'object' || model === null) return [];
+            const candidate = model as { id?: unknown; name?: unknown };
+            return typeof candidate.id === 'string'
+              ? [candidate.id]
+              : typeof candidate.name === 'string'
+                ? [candidate.name]
+                : [];
+          });
         }
       } catch (fetchErr) {
         console.warn('Could not fetch models directly from renderer:', fetchErr);
@@ -143,7 +165,9 @@ export default function OnboardingGuard({ children }: OnboardingGuardProps) {
       if (models.length > 0) {
         try {
           await window.electron.setSetting('houshiar_models', models);
-        } catch {}
+        } catch (error) {
+          console.warn('Could not cache Houshiar models:', error);
+        }
       }
 
       // Direct secret persistence for both key variants
@@ -157,7 +181,9 @@ export default function OnboardingGuard({ children }: OnboardingGuardProps) {
           await acpSaveProviderConfig('custom_houshiar', [
             { key: 'CUSTOM_HOUSHIAR_API_KEY', value: trimmedKey },
           ]);
-        } catch {}
+        } catch (error) {
+          console.warn('Could not configure custom Houshiar provider:', error);
+        }
       }
 
       try {
@@ -165,13 +191,17 @@ export default function OnboardingGuard({ children }: OnboardingGuardProps) {
       } catch {
         try {
           await acpSaveDefaults('custom_houshiar', defaultModel);
-        } catch {}
+        } catch (error) {
+          console.warn('Could not set custom Houshiar defaults:', error);
+        }
       }
 
       try {
         await acpUpsertConfig('GOOSE_PROVIDER', 'houshiar', false);
         await acpUpsertConfig('GOOSE_MODEL', defaultModel, false);
-      } catch {}
+      } catch (error) {
+        console.warn('Could not save Houshiar environment defaults:', error);
+      }
 
       await refreshCurrentModelAndProvider();
 
@@ -180,9 +210,9 @@ export default function OnboardingGuard({ children }: OnboardingGuardProps) {
         setHasProvider(true);
         navigate('/', { replace: true });
       }, 700);
-    } catch (err: any) {
+    } catch (err) {
       console.error('Error connecting to Houshiar:', err);
-      const msg = err?.message || err?.data || String(err);
+      const msg = errorMessage(err);
       setError(`خطا در اتصال: ${msg}`);
       setIsValidating(false);
     }

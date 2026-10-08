@@ -200,11 +200,28 @@ export default function AuthSettingsSection() {
         });
 
         if (response.ok) {
-          const data = await response.json();
-          const arr = Array.isArray(data) ? data : data.data || data.models || [];
-          models = arr
-            .map((m: any) => (typeof m === 'string' ? m : m.id || m.name))
-            .filter(Boolean);
+          const data: unknown = await response.json();
+          const responseData =
+            typeof data === 'object' && data !== null
+              ? (data as { data?: unknown; models?: unknown })
+              : {};
+          const modelsResponse = Array.isArray(data)
+            ? data
+            : Array.isArray(responseData.data)
+              ? responseData.data
+              : Array.isArray(responseData.models)
+                ? responseData.models
+                : [];
+          models = modelsResponse.flatMap((model: unknown) => {
+            if (typeof model === 'string') return [model];
+            if (typeof model !== 'object' || model === null) return [];
+            const candidate = model as { id?: unknown; name?: unknown };
+            return typeof candidate.id === 'string'
+              ? [candidate.id]
+              : typeof candidate.name === 'string'
+                ? [candidate.name]
+                : [];
+          });
         }
       } catch (fetchErr) {
         console.warn('Could not fetch models directly from renderer:', fetchErr);
@@ -213,7 +230,9 @@ export default function AuthSettingsSection() {
       if (models.length > 0) {
         try {
           await window.electron.setSetting('houshiar_models', models);
-        } catch {}
+        } catch (error) {
+          console.warn('Could not cache Houshiar models:', error);
+        }
       }
 
       const defaultModel = models.includes('claude-sonnet-5')
@@ -233,9 +252,9 @@ export default function AuthSettingsSection() {
       toast.success('کلید API هوشیار با موفقیت ذخیره شد');
       setIsEditingKey(false);
       setHoushiarKeyInput('');
-    } catch (err: any) {
+    } catch (err) {
       console.error('Error saving Houshiar key:', err);
-      const msg = err?.message || err?.data || String(err);
+      const msg = errorMessage(err);
       setKeyError(`خطا در ذخیره‌سازی: ${msg}`);
     } finally {
       setIsSavingKey(false);

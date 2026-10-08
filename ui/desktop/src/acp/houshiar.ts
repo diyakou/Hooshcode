@@ -1,5 +1,6 @@
 import type { HoushiarUsageData } from '../types/houshiar';
 import { getAcpClient } from './acpConnection';
+import { errorMessage } from '../utils/conversionUtils';
 
 export async function acpGetHoushiarUsage(customApiKey?: string): Promise<HoushiarUsageData> {
   // If custom API key is passed directly (e.g. from UI input before saving), query endpoints
@@ -37,8 +38,7 @@ export async function acpGetHoushiarUsage(customApiKey?: string): Promise<Houshi
     const client = await getAcpClient();
     const result = await client.connection.agent.request('goose/houshiar/usage', {});
     return result as HoushiarUsageData;
-  } catch (err: any) {
-    const msg = err?.data || err?.message || String(err);
-    throw new Error(msg);
+  } catch (error) {
+    throw new Error(errorMessage(error), { cause: error });
   }
 }
