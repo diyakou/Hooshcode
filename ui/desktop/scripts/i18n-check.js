@@ -19,9 +19,7 @@ execFileSync(
   [
     formatjs,
     'extract',
-    'src/**/*.{ts,tsx}',
-    '--ignore',
-    '**/*.d.ts',
+    'src/**/!(*.d).{ts,tsx}',
     '--out-file',
     tmpFile,
     '--flatten',

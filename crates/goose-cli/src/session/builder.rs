@@ -296,7 +296,22 @@ async fn resolve_provider_and_model(
     saved_provider: Option<String>,
     saved_model_config: Option<goose_providers::model::ModelConfig>,
 ) -> ResolvedProviderConfig {
-    if config.get_secret::<String>("HOUSHIAR_API_KEY").is_err()
+    let recipe_settings = session_config
+        .recipe
+        .as_ref()
+        .and_then(|r| r.settings.as_ref());
+    let configured_provider = config.get_goose_provider().ok();
+
+    let provider_name = session_config
+        .provider
+        .clone()
+        .or_else(|| saved_provider.clone())
+        .or_else(|| recipe_settings.and_then(|settings| settings.goose_provider.clone()))
+        .or_else(|| configured_provider.clone())
+        .unwrap_or_else(|| "houshiar".to_string());
+
+    if provider_name == "houshiar"
+        && config.get_secret::<String>("HOUSHIAR_API_KEY").is_err()
         && std::env::var("HOUSHIAR_API_KEY").is_err()
     {
         if std::io::stdin().is_terminal() {
@@ -311,14 +326,6 @@ async fn resolve_provider_and_model(
             process::exit(1);
         }
     }
-
-    let recipe_settings = session_config
-        .recipe
-        .as_ref()
-        .and_then(|r| r.settings.as_ref());
-    let configured_provider = config.get_goose_provider().ok();
-
-    let provider_name = "houshiar".to_string();
 
     let saved_provider_matches = saved_provider.as_deref() == Some(provider_name.as_str());
     let provider_overridden = session_config.provider.is_some();
