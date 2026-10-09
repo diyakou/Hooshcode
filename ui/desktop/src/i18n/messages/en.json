@@ -4256,6 +4256,9 @@
   "skillsView.adjustSearchTerms": {
     "defaultMessage": "Try adjusting your search terms"
   },
+  "skillsView.comingSoon": {
+    "defaultMessage": "Coming Soon"
+  },
   "skillsView.errorLoadingSkills": {
     "defaultMessage": "Error Loading Skills"
   },

@@ -3869,9 +3869,6 @@
   "sessions.chatHistory": {
     "defaultMessage": "تاریخچه چت"
   },
-  "sessions.action.shareNostr": {
-    "defaultMessage": "پیوند Nostr رمزگذاری شده را به اشتراک بگذارید"
-  },
   "sessions.close": {
     "defaultMessage": "بستن"
   },
@@ -3905,21 +3902,6 @@
   "sessions.empty.description": {
     "defaultMessage": "سابقه چت شما در اینجا ظاهر می شود"
   },
-  "sessions.importNostr": {
-    "defaultMessage": "لینک واردات"
-  },
-  "sessions.importNostr.placeholder": {
-    "defaultMessage": "هوشیار://sessions/nostr?nevent=...&key=..."
-  },
-  "sessions.importing": {
-    "defaultMessage": "واردات..."
-  },
-  "sessions.importNostr.description": {
-    "defaultMessage": "برای واکشی، رمزگشایی و وارد کردن جلسه، پیوند اشتراک هوشیار Nostr را جای‌گذاری کنید."
-  },
-  "sessions.importNostr.title": {
-    "defaultMessage": "وارد کردن Nostr Session"
-  },
   "sessions.save": {
     "defaultMessage": "ذخیره کنید"
   },
@@ -3944,9 +3926,6 @@
   "sessions.search.noResults": {
     "defaultMessage": "هیچ جلسه منطبقی پیدا نشد"
   },
-  "sessions.shareNostr.description": {
-    "defaultMessage": "هر کسی که این پیوند را داشته باشد می‌تواند جلسه را واکشی و رمزگشایی کند. مثل یک راز با آن رفتار کنید."
-  },
   "sessions.searchPlaceholder": {
     "defaultMessage": "سابقه جستجو..."
   },
@@ -3958,9 +3937,6 @@
   },
   "sessions.toast.deleteFailed": {
     "defaultMessage": "جلسه \"{name}\" حذف نشد: {error}"
-  },
-  "sessions.shareNostr.title": {
-    "defaultMessage": "پیوند اشتراک گذاری Nostr رمزگذاری شده"
   },
   "sessions.toast.deleted": {
     "defaultMessage": "جلسه با موفقیت حذف شد"
@@ -3979,12 +3955,6 @@
   },
   "sessions.toast.importFailed": {
     "defaultMessage": "وارد کردن جلسه انجام نشد: {error}"
-  },
-  "sessions.toast.shareNostr": {
-    "defaultMessage": "پیوند اشتراک گذاری Nostr رمزگذاری شده ایجاد شد"
-  },
-  "sessions.toast.shareNostrFailed": {
-    "defaultMessage": "پیوند اشتراک Nostr ایجاد نشد: {error}"
   },
   "sessions.toast.updateFailed": {
     "defaultMessage": "شرح جلسه به روز نشد: {error}"
@@ -4762,5 +4732,11 @@
   },
   "settings.language.persian": {
     "defaultMessage": "فارسی (Persian)"
+  },
+  "mcpAppRenderer.resizePipWindow": {
+    "defaultMessage": "تغییر اندازه پنجره تصویر در تصویر"
+  },
+  "navigationPanel.loadingChats": {
+    "defaultMessage": "در حال بارگذاری گفتگوها…"
   }
 }

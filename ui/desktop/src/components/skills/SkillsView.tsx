@@ -40,6 +40,10 @@ const i18n = defineMessages({
     id: 'skillsView.adjustSearchTerms',
     defaultMessage: 'Try adjusting your search terms',
   },
+  comingSoon: {
+    id: 'skillsView.comingSoon',
+    defaultMessage: 'Coming Soon',
+  },
   skillsTitle: {
     id: 'skillsView.skillsTitle',
     defaultMessage: 'Skills',
