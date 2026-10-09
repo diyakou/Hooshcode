@@ -118,6 +118,29 @@ export async function loadMessages(locale: string): Promise<Record<string, strin
     const mod = await import(`./compiled/${locale}.json`);
     return mod.default ?? mod;
   } catch {
+    try {
+      const rawMod = await import(`./messages/${locale}.json`);
+      const raw = (rawMod.default ?? rawMod) as Record<string, { defaultMessage?: string } | string>;
+      const messages: Record<string, string> = {};
+      for (const [key, value] of Object.entries(raw)) {
+        if (typeof value === 'string') {
+          messages[key] = value;
+        } else if (
+          value &&
+          typeof value === 'object' &&
+          'defaultMessage' in value &&
+          typeof value.defaultMessage === 'string'
+        ) {
+          messages[key] = value.defaultMessage;
+        }
+      }
+      if (Object.keys(messages).length > 0) {
+        return messages;
+      }
+    } catch {
+      // Fallback failed as well, proceed to warning
+    }
+
     console.warn(
       `[i18n] No message catalog found for locale "${locale}", falling back to English.`
     );
