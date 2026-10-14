@@ -233,6 +233,11 @@ const ID_FIELD: &str = "id";
 const NAME_FIELD: &str = "name";
 const INPUT_FIELD: &str = "input";
 const TOOL_USE_ID_FIELD: &str = "tool_use_id";
+const COMPUTER_CONTROL_TOOL: &str = "computercontroller__computer_control";
+const COMPUTER_TOOLSET_TYPE: &str = "computer_toolset_20260801";
+const COMPUTER_TOOLSET_NAME: &str = "computer";
+const COMPUTER_ACTION_META: &str = "hooshcode.anthropicComputer.action";
+const COMPUTER_INPUT_META: &str = "hooshcode.anthropicComputer.input";
 const IS_ERROR_FIELD: &str = "is_error";
 const SIGNATURE_FIELD: &str = "signature";
 const DATA_FIELD: &str = "data";
@@ -270,6 +275,18 @@ fn args_to_input_value(arguments: Option<JsonObject>) -> Value {
     Value::Object(arguments.unwrap_or_default())
 }
 
+fn native_computer_call(
+    tool_request: &crate::conversation::message::ToolRequest,
+) -> Option<(&str, Value)> {
+    let meta = tool_request.tool_meta.as_ref()?;
+    let action = meta.get(COMPUTER_ACTION_META)?.as_str()?;
+    let input = meta
+        .get(COMPUTER_INPUT_META)
+        .cloned()
+        .unwrap_or_else(|| json!({}));
+    Some((action, input))
+}
+
 /// Convert internal Message format to Anthropic's API message specification
 pub fn format_messages(messages: &[Message]) -> Vec<Value> {
     format_messages_with_options(messages, &AnthropicFormatOptions::default())
@@ -280,6 +297,18 @@ fn format_messages_with_options(
     options: &AnthropicFormatOptions,
 ) -> Vec<Value> {
     let mut anthropic_messages = Vec::new();
+    let native_computer_ids: HashSet<&str> = messages
+        .iter()
+        .flat_map(|message| message.content.iter())
+        .filter_map(|block| match block {
+            MessageContentBlock::ToolRequest(request)
+                if native_computer_call(request).is_some() =>
+            {
+                Some(request.id.as_str())
+            }
+            _ => None,
+        })
+        .collect();
 
     for message in messages {
         let role = match message.role {
@@ -305,12 +334,22 @@ fn format_messages_with_options(
                 MessageContentBlock::ToolRequest(tool_request) => {
                     match &tool_request.tool_call {
                         Ok(tool_call) => {
-                            content.push(json!({
-                                TYPE_FIELD: TOOL_USE_TYPE,
-                                ID_FIELD: tool_request.id,
-                                NAME_FIELD: tool_call.name,
-                                INPUT_FIELD: args_to_input_value(tool_call.arguments.clone())
-                            }));
+                            if let Some((action, input)) = native_computer_call(tool_request) {
+                                content.push(json!({
+                                    TYPE_FIELD: TOOL_USE_TYPE,
+                                    ID_FIELD: tool_request.id,
+                                    NAME_FIELD: action,
+                                    "toolset_name": COMPUTER_TOOLSET_NAME,
+                                    INPUT_FIELD: input
+                                }));
+                            } else {
+                                content.push(json!({
+                                    TYPE_FIELD: TOOL_USE_TYPE,
+                                    ID_FIELD: tool_request.id,
+                                    NAME_FIELD: tool_call.name,
+                                    INPUT_FIELD: args_to_input_value(tool_call.arguments.clone())
+                                }));
+                            }
                         }
                         Err(_tool_error) => {
                             // The paired tool response carries the parse error and
@@ -416,19 +455,27 @@ fn format_messages_with_options(
                                 Value::String(text_parts.join("\n"))
                             };
 
-                            content.push(json!({
+                            let mut result_block = json!({
                                 TYPE_FIELD: TOOL_RESULT_TYPE,
                                 TOOL_USE_ID_FIELD: tool_response.id,
                                 CONTENT_FIELD: content_value
-                            }));
+                            });
+                            if native_computer_ids.contains(tool_response.id.as_str()) {
+                                result_block["toolset_name"] = json!(COMPUTER_TOOLSET_NAME);
+                            }
+                            content.push(result_block);
                         }
                         Err(tool_error) => {
-                            content.push(json!({
+                            let mut result_block = json!({
                                 TYPE_FIELD: TOOL_RESULT_TYPE,
                                 TOOL_USE_ID_FIELD: tool_response.id,
                                 CONTENT_FIELD: format!("Error: {}", tool_error),
                                 IS_ERROR_FIELD: true
-                            }));
+                            });
+                            if native_computer_ids.contains(tool_response.id.as_str()) {
+                                result_block["toolset_name"] = json!(COMPUTER_TOOLSET_NAME);
+                            }
+                            content.push(result_block);
                         }
                     }
                 }
@@ -551,8 +598,13 @@ fn anthropic_flavored_input_schema(input_schema: Arc<JsonObject>) -> Arc<JsonObj
 pub fn format_tools(tools: &[Tool], options: &AnthropicFormatOptions) -> Vec<Value> {
     let mut unique_tools = HashSet::new();
     let mut tool_specs = Vec::new();
+    let mut computer_use = false;
 
     for tool in tools {
+        if tool.name == COMPUTER_CONTROL_TOOL {
+            computer_use = true;
+            continue;
+        }
         if unique_tools.insert(tool.name.clone()) {
             tool_specs.push(json!({
                 NAME_FIELD: tool.name,
@@ -562,17 +614,40 @@ pub fn format_tools(tools: &[Tool], options: &AnthropicFormatOptions) -> Vec<Val
         }
     }
 
-    if options.prompt_cache_disabled {
-        return tool_specs;
+    if !options.prompt_cache_disabled {
+        // Anthropic-defined toolsets don't accept cache_control. Cache only the
+        // conventional tools that precede the computer toolset.
+        if let Some(last_tool) = tool_specs.last_mut() {
+            last_tool
+                .as_object_mut()
+                .unwrap()
+                .insert(CACHE_CONTROL_FIELD.to_string(), options.cache_control());
+        }
     }
 
-    // Add "cache_control" to the last tool spec, if any. This means that all tool definitions,
-    // will be cached as a single prefix.
-    if let Some(last_tool) = tool_specs.last_mut() {
-        last_tool
-            .as_object_mut()
-            .unwrap()
-            .insert(CACHE_CONTROL_FIELD.to_string(), options.cache_control());
+    if computer_use {
+        #[cfg(target_os = "windows")]
+        let exclude_tools = json!([
+            "zoom",
+            "triple_click",
+            "left_mouse_down",
+            "left_mouse_up",
+            "cursor_position",
+            "scroll",
+            "hold_key",
+            "wait"
+        ]);
+        #[cfg(not(target_os = "windows"))]
+        let exclude_tools = json!([
+            "zoom",
+            "left_mouse_down",
+            "left_mouse_up",
+            "cursor_position"
+        ]);
+        tool_specs.push(json!({
+            "type": COMPUTER_TOOLSET_TYPE,
+            "configs": {"exclude_tools": exclude_tools}
+        }));
     }
 
     tool_specs
@@ -983,6 +1058,85 @@ pub fn create_request_for_model(
     Ok(payload)
 }
 
+fn computer_action_arguments(action: &str, input: &Value) -> JsonObject {
+    let coordinate = |key: &str| {
+        input
+            .get(key)
+            .and_then(Value::as_array)
+            .filter(|point| point.len() == 2)
+            .map(|point| format!("{},{}", point[0], point[1]))
+    };
+    let command = match action {
+        "screenshot" => "screenshot".to_string(),
+        "left_click" | "right_click" | "middle_click" | "double_click" | "triple_click" => {
+            let mut command = "click".to_string();
+            if let Some(point) = coordinate("coordinate") {
+                command.push_str(&format!(" --coords {point}"));
+            }
+            match action {
+                "right_click" => command.push_str(" --right"),
+                "middle_click" => command.push_str(" --middle"),
+                "double_click" => command.push_str(" --double"),
+                "triple_click" => command.push_str(" --double"),
+                _ => {}
+            }
+            command
+        }
+        "left_click_drag" => format!(
+            "drag --from {} --to {}",
+            coordinate("start_coordinate").unwrap_or_default(),
+            coordinate("coordinate").unwrap_or_default()
+        ),
+        "mouse_move" => format!(
+            "move --coords {}",
+            coordinate("coordinate").unwrap_or_default()
+        ),
+        "type" => format!(
+            "type --text {}",
+            serde_json::to_string(
+                input
+                    .get("text")
+                    .and_then(Value::as_str)
+                    .unwrap_or_default()
+            )
+            .unwrap_or_else(|_| "\"\"".to_string())
+        ),
+        "key" => {
+            let key = input
+                .get("text")
+                .and_then(Value::as_str)
+                .unwrap_or("Return");
+            let repeat = input.get("repeat").and_then(Value::as_u64).unwrap_or(1);
+            if key.contains('+') {
+                format!("hotkey --keys {}", key.replace('+', ","))
+            } else {
+                format!("press {key} --count {repeat}")
+            }
+        }
+        "scroll" => {
+            let direction = input
+                .get("scroll_direction")
+                .and_then(Value::as_str)
+                .unwrap_or("down");
+            let amount = input
+                .get("scroll_amount")
+                .and_then(Value::as_u64)
+                .unwrap_or(1);
+            format!("scroll {direction} --count {amount}")
+        }
+        "wait" => format!(
+            "wait --duration {}",
+            input.get("duration").and_then(Value::as_f64).unwrap_or(1.0)
+        ),
+        _ => action.to_string(),
+    };
+
+    object(json!({
+        "command": command,
+        "capture_screenshot": action == "screenshot"
+    }))
+}
+
 /// Process streaming response from Anthropic's API
 pub fn response_to_streaming_message<S>(
     mut stream: S,
@@ -1029,6 +1183,7 @@ where
             id: String,
             name: String,
             arguments: String,
+            computer_action: bool,
         }
 
         let mut accumulated_tool_calls: std::collections::HashMap<i32, StreamingToolCall> = std::collections::HashMap::new();
@@ -1100,6 +1255,10 @@ where
                                         id: id.to_string(),
                                         name: name.to_string(),
                                         arguments: String::new(),
+                                        computer_action: content_block
+                                            .get("toolset_name")
+                                            .and_then(Value::as_str)
+                                            == Some(COMPUTER_TOOLSET_NAME),
                                     });
                                 }
                             }
@@ -1176,7 +1335,7 @@ where
                     }
                     if let Some(index) = block_index(&event.data) {
                         if let Some(call) = accumulated_tool_calls.remove(&index) {
-                            let StreamingToolCall { id, name, arguments } = call;
+                            let StreamingToolCall { id, name, arguments, computer_action } = call;
                             let parsed_args = if arguments.is_empty() {
                                 json!({})
                             } else {
@@ -1204,12 +1363,32 @@ where
                                 }
                             };
 
-                            let tool_call = CallToolRequestParams::new(name).with_arguments(object(parsed_args));
+                            let (tool_name, tool_arguments) = if computer_action {
+                                (COMPUTER_CONTROL_TOOL.to_string(), computer_action_arguments(&name, &parsed_args))
+                            } else {
+                                (name.clone(), object(parsed_args.clone()))
+                            };
+                            let tool_call = CallToolRequestParams::new(tool_name).with_arguments(tool_arguments);
 
+                            let mut block = MessageContentBlock::tool_request_with_provider_index(
+                                id,
+                                Ok(tool_call),
+                                None,
+                                index,
+                            );
+                            if computer_action {
+                                if let MessageContentBlock::ToolRequest(request) = &mut block {
+                                    request.tool_meta = Some(json!({
+                                        crate::conversation::message::TOOL_META_PROVIDER_INDEX_KEY: index,
+                                        COMPUTER_ACTION_META: name,
+                                        COMPUTER_INPUT_META: parsed_args,
+                                    }));
+                                }
+                            }
                             let mut message = Message::new(
                                 rmcp::model::Role::Assistant,
                                 chrono::Utc::now().timestamp(),
-                                vec![MessageContentBlock::tool_request_with_provider_index(id, Ok(tool_call), None, index)],
+                                vec![block],
                             );
                             message.id = message_id.clone();
                             yield (Some(message), None);
