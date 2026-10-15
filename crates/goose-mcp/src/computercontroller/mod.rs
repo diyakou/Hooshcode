@@ -355,7 +355,7 @@ impl ComputerControllerServer {
                 4. command: "click --coords 500,300 --double" — double-click at coordinates
                 5. command: "click --coords 500,300 --right"  — right-click at coordinates
                 6. command: "move --coords 500,300"           — move mouse cursor
-                7. command: "drag --from 100,200 --to 400,500"— drag mouse (timeline scrub, clip move, sliders)
+                7. command: "drag --from 100,200 --to 400,500"— drag mouse (timeline scrub, clip move, sliders, drawing in mspaint)
                 8. command: "type \"my text\" --return"       — paste text and press enter
                 9. command: "press space"                     — press key (space=play/pause in Premiere, etc.)
                 10. command: "press tab --count 3"            — press key multiple times
@@ -366,10 +366,11 @@ impl ComputerControllerServer {
                 15. command: "hotkey --keys ctrl,t"           — free transform (Photoshop)
                 16. command: "app switch Photoshop"           — activate and bring Photoshop window to focus
                 17. command: "app switch Premiere"            — activate Premiere Pro window
-                18. command: "list windows"                   — list all open windows and titles
+                18. command: "app switch mspaint"             — activate MS Paint window
+                19. command: "list windows"                   — list all open windows and titles
 
-              Tips for Creative Apps (Photoshop & Premiere Pro):
-              - Always use "app switch Photoshop" or "app switch Premiere" before performing actions.
+              Tips for Creative Apps (Photoshop, Premiere Pro & MS Paint):
+              - Always use "app switch Photoshop", "app switch Premiere", or "app switch mspaint" before performing actions.
               - Use "see" with capture_screenshot: true to inspect timeline, layers, canvas, or dialogs.
               - In Premiere: 'space' plays/pauses, 'c' activates Razor tool, 'v' activates Selection tool, 'ctrl,k' cuts at playhead.
               - In Photoshop: 'v' is move, 'b' is brush, 'ctrl,t' is transform, 'ctrl,j' duplicates layer.
@@ -928,16 +929,16 @@ impl ComputerControllerServer {
             - see / screenshot: Capture screen screenshot (returns image). Optional: --app <name> to focus first.
             - click --coords x,y [--double] [--right] [--middle]: Click at coordinates or current position.
             - move --coords x,y: Move mouse cursor.
-            - drag --from x1,y1 --to x2,y2: Click and drag mouse between coordinates (ideal for Premiere timeline & Photoshop sliders/layers).
+            - drag --from x1,y1 --to x2,y2: Click and drag mouse between coordinates (ideal for Premiere timeline & Photoshop sliders/layers, drawing in mspaint).
             - type --text \"...\" [--return] [--clear]: Type/paste text into active field.
             - press <key> [--count N]: Press special key (enter, tab, space, escape, backspace, delete, up, down, left, right, f1-f12).
             - hotkey --keys <k1,k2,...>: Trigger shortcut combo like 'ctrl,s', 'ctrl,z', 'ctrl,shift,z', 'ctrl,k', 'ctrl,m', 'ctrl,t', 'ctrl,j'.
-            - app switch <name>: Bring application to foreground; if not running, launches it (e.g. 'Photoshop', 'Premiere', 'notepad').
+            - app switch <name>: Bring application to foreground; if not running, launches it (e.g. 'Photoshop', 'Premiere', 'mspaint', 'notepad').
             - open <url-or-path>: Open a URL or file with the default application (e.g. 'open https://example.com', 'open C:\\file.pdf').
             - list windows: List active desktop windows and titles.
             
             Set capture_screenshot=true to capture screen after action to verify result.
-            Specially tailored for Photoshop photo editing and Premiere Pro video editing workflows.
+            Specially tailored for Photoshop photo editing, MS Paint drawing and Premiere Pro video editing workflows.
         "
     )]
     pub async fn computer_control(
