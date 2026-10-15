@@ -152,7 +152,7 @@ Write-Output "Screen captured ($($bounds.Width)x$($bounds.Height))"
                 let (x_part, y_part) = match coords {
                     Some((x, y)) => (
                         format!(
-                            "[WinMouse]::SetCursorPos({}, {}); Start-Sleep -Milliseconds 50;",
+                            "[WinMouse]::SetCursorPos({}, {}); [WinMouse]::mouse_event([WinMouse]::MOUSEEVENTF_MOVE, 0, 0, 0, 0); Start-Sleep -Milliseconds 50;",
                             x, y
                         ),
                         format!(" at ({}, {})", x, y),
@@ -178,6 +178,7 @@ using System.Runtime.InteropServices;
 public class WinMouse {{
     [DllImport("user32.dll")] public static extern bool SetCursorPos(int x, int y);
     [DllImport("user32.dll")] public static extern void mouse_event(uint flags, int dx, int dy, uint data, int extra);
+    public const uint MOUSEEVENTF_MOVE = 0x0001;
     public const uint MOUSEEVENTF_LEFTDOWN = 0x02;
     public const uint MOUSEEVENTF_LEFTUP = 0x04;
     public const uint MOUSEEVENTF_RIGHTDOWN = 0x08;
@@ -213,12 +214,15 @@ $typeDef = @"
 using System.Runtime.InteropServices;
 public class WinMouseMove {{
     [DllImport("user32.dll")] public static extern bool SetCursorPos(int x, int y);
+    [DllImport("user32.dll")] public static extern void mouse_event(uint flags, int dx, int dy, uint data, int extra);
+    public const uint MOUSEEVENTF_MOVE = 0x0001;
 }}
 "@
 if (-not ([System.Management.Automation.PSTypeName]'WinMouseMove').Type) {{
     Add-Type -TypeDefinition $typeDef
 }}
 [WinMouseMove]::SetCursorPos({}, {})
+[WinMouseMove]::mouse_event([WinMouseMove]::MOUSEEVENTF_MOVE, 0, 0, 0, 0)
 Write-Output "Moved cursor to ({}, {})"
 "#,
                     coords.0, coords.1, coords.0, coords.1
@@ -244,6 +248,7 @@ using System.Runtime.InteropServices;
 public class WinMouseDrag {{
     [DllImport("user32.dll")] public static extern bool SetCursorPos(int x, int y);
     [DllImport("user32.dll")] public static extern void mouse_event(uint flags, int dx, int dy, uint data, int extra);
+    public const uint MOUSEEVENTF_MOVE = 0x0001;
     public const uint MOUSEEVENTF_LEFTDOWN = 0x02;
     public const uint MOUSEEVENTF_LEFTUP = 0x04;
 }}
@@ -252,6 +257,7 @@ if (-not ([System.Management.Automation.PSTypeName]'WinMouseDrag').Type) {{
     Add-Type -TypeDefinition $typeDef
 }}
 [WinMouseDrag]::SetCursorPos({from_x}, {from_y})
+[WinMouseDrag]::mouse_event([WinMouseDrag]::MOUSEEVENTF_MOVE, 0, 0, 0, 0)
 Start-Sleep -Milliseconds 60
 [WinMouseDrag]::mouse_event([WinMouseDrag]::MOUSEEVENTF_LEFTDOWN, 0, 0, 0, 0)
 Start-Sleep -Milliseconds 60
@@ -261,6 +267,7 @@ for ($i = 1; $i -le $steps; $i++) {{
     $curX = [int]({from_x} + ({to_x} - {from_x}) * ($i / $steps))
     $curY = [int]({from_y} + ({to_y} - {from_y}) * ($i / $steps))
     [WinMouseDrag]::SetCursorPos($curX, $curY)
+    [WinMouseDrag]::mouse_event([WinMouseDrag]::MOUSEEVENTF_MOVE, 0, 0, 0, 0)
     Start-Sleep -Milliseconds 15
 }}
 
