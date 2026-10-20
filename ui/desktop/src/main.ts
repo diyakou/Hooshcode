@@ -36,6 +36,7 @@ import { normalizeAcpHttpBaseUrl } from './acp/url';
 import { expandTilde, sanitizeGoosePathRoot } from './utils/pathUtils';
 import log from './utils/logger';
 import { ensureWinShims } from './utils/winShims';
+import { installWindowsCli } from './utils/windowsCliInstall';
 import { addRecentDir, loadRecentDirs } from './utils/recentDirs';
 import { formatAppName, errorMessage, formatErrorForLogging } from './utils/conversionUtils';
 import { isRetiredGooseChatApp } from './utils/retiredApps';
@@ -2216,6 +2217,49 @@ ipcMain.handle('set-spellcheck', async (_event, enable: boolean) => {
   return true;
 });
 
+ipcMain.handle('fetch-houshiar-models', async (_event, apiKey: string) => {
+  if (!apiKey.trim()) {
+    throw new Error('API key is required');
+  }
+
+  const response = await net.fetch('https://wqai.morvism.ir/v1/models', {
+    method: 'GET',
+    headers: {
+      'x-api-key': apiKey.trim(),
+      'anthropic-version': '2023-06-01',
+      'x-client-brand': 'houshiar-code',
+    },
+  });
+  if (!response.ok) {
+    throw new Error(`Could not fetch models (${response.status})`);
+  }
+
+  const payload: unknown = await response.json();
+  const objectPayload =
+    typeof payload === 'object' && payload !== null
+      ? (payload as { data?: unknown; models?: unknown })
+      : {};
+  const entries = Array.isArray(payload)
+    ? payload
+    : Array.isArray(objectPayload.data)
+      ? objectPayload.data
+      : Array.isArray(objectPayload.models)
+        ? objectPayload.models
+        : [];
+  const models = entries.flatMap((entry: unknown) => {
+    if (typeof entry === 'string') return [entry];
+    if (typeof entry !== 'object' || entry === null) return [];
+    const model = entry as { id?: unknown; name?: unknown };
+    if (typeof model.id === 'string') return [model.id];
+    return typeof model.name === 'string' ? [model.name] : [];
+  });
+
+  if (models.length === 0) {
+    throw new Error('The models endpoint returned no models');
+  }
+  return [...new Set(models)].sort();
+});
+
 ipcMain.handle('get-spellcheck-state', () => {
   try {
     const settings = getSettings();
@@ -2502,6 +2546,14 @@ async function appMain() {
 
   // Ensure Windows shims are available before any MCP processes are spawned
   await ensureWinShims();
+
+  if (app.isPackaged && process.platform === 'win32') {
+    try {
+      await installWindowsCli(process.resourcesPath, app.getPath('userData'));
+    } catch (error) {
+      log.error('Failed to install Houshiar CLI commands', error);
+    }
+  }
 
   registerUpdateIpcHandlers();
 

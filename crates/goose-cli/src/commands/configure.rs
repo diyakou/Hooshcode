@@ -264,8 +264,10 @@ pub async fn validate_houshiar_key(api_key: &str) -> anyhow::Result<Vec<String>>
         })
         .unwrap_or_default();
 
+    models.sort();
+    models.dedup();
     if models.is_empty() {
-        models.push("claude-sonnet-5".to_string());
+        anyhow::bail!("The models endpoint returned no models");
     }
 
     Ok(models)

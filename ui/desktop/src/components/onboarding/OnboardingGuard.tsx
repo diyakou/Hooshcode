@@ -14,6 +14,7 @@ import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { defineMessages, useIntl } from '../../i18n';
 import { errorMessage } from '../../utils/conversionUtils';
+import { fetchHoushiarModels } from '../../utils/houshiarModels';
 
 const i18n = defineMessages({
   checkProviderErrorTitle: {
@@ -119,48 +120,9 @@ export default function OnboardingGuard({ children }: OnboardingGuardProps) {
     setSuccessMessage(null);
 
     try {
-      let models: string[] = [];
-      try {
-        const response = await fetch('https://wqai.morvism.ir/v1/models', {
-          method: 'GET',
-          headers: {
-            'x-api-key': trimmedKey,
-            'anthropic-version': '2023-06-01',
-            'x-client-brand': 'houshiar-code',
-          },
-        });
+      const models = await fetchHoushiarModels(trimmedKey);
 
-        if (response.ok) {
-          const data: unknown = await response.json();
-          const responseData =
-            typeof data === 'object' && data !== null
-              ? (data as { data?: unknown; models?: unknown })
-              : {};
-          const modelsResponse = Array.isArray(data)
-            ? data
-            : Array.isArray(responseData.data)
-              ? responseData.data
-              : Array.isArray(responseData.models)
-                ? responseData.models
-                : [];
-          models = modelsResponse.flatMap((model: unknown) => {
-            if (typeof model === 'string') return [model];
-            if (typeof model !== 'object' || model === null) return [];
-            const candidate = model as { id?: unknown; name?: unknown };
-            return typeof candidate.id === 'string'
-              ? [candidate.id]
-              : typeof candidate.name === 'string'
-                ? [candidate.name]
-                : [];
-          });
-        }
-      } catch (fetchErr) {
-        console.warn('Could not fetch models directly from renderer:', fetchErr);
-      }
-
-      const defaultModel = models.includes('claude-sonnet-5')
-        ? 'claude-sonnet-5'
-        : models[0] || 'claude-sonnet-5';
+      const defaultModel = models.includes('claude-sonnet-5') ? 'claude-sonnet-5' : models[0];
 
       if (models.length > 0) {
         try {

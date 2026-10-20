@@ -133,6 +133,7 @@ type ElectronAPI = {
   getDockIconState: () => Promise<boolean>;
   getSetting: <K extends SettingKey>(key: K) => Promise<Settings[K]>;
   setSetting: <K extends SettingKey>(key: K, value: Settings[K]) => Promise<void>;
+  fetchHoushiarModels: (apiKey: string) => Promise<string[]>;
   getSecretKey: () => Promise<string | null>;
   getAcpUrl: () => Promise<string | null>;
   setWakelock: (enable: boolean) => Promise<boolean>;
@@ -260,6 +261,7 @@ const electronAPI: ElectronAPI = {
     }
     return ipcRenderer.invoke('set-setting', key, value);
   },
+  fetchHoushiarModels: (apiKey: string) => ipcRenderer.invoke('fetch-houshiar-models', apiKey),
   getSecretKey: () => ipcRenderer.invoke('get-secret-key'),
   getAcpUrl: () => ipcRenderer.invoke('get-acp-url'),
   setWakelock: (enable: boolean) => ipcRenderer.invoke('set-wakelock', enable),
