@@ -388,12 +388,16 @@ impl ComputerControllerServer {
             The ComputerControllerExtension helps you with common tasks like controlling the computer,
             document processing, and automation without requiring programming expertise.
 
-            Use the shell (developer extension) for scripting, working with data files (csv, json, text),
-            and accessing web sites or APIs when needed.
+            Choose tools by the state that must be observed:
+            - Use Computer Controller for every task requiring seeing or interacting with a rendered GUI: browsers, logged-in pages, video/image editors, Office, native applications, and system dialogs.
+            - Use the Developer shell for source code, scripts, files, processes, CLI tools, and non-interactive HTTP/API requests whose results are text.
+            - Launching a GUI through the shell does not provide visual state. After launch, use computer_control `see`, interact, then `see` again to verify.
+            - Never ask the user for a screenshot when Computer Controller is enabled and can call `see`.
+            - Repeat the observe -> act -> verify loop until the visible result is confirmed; do not stop after launching an application.
+            - If Computer Controller tools are absent from the active session, state clearly that GUI control is unavailable or disabled; do not claim a shell launch was visual inspection.
+
             Try to do your best to find ways to complete a task without too many questions or offering options unless it is really unclear, find a way if you can.
             You can also guide them steps if they can help out as you go along.
-
-            There is already a screenshot tool available you can use if needed to see what is on screen.
 
             {os_instructions}
             "#,
