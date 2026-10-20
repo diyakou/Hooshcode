@@ -134,12 +134,15 @@ Write-Output "Screen captured ($($bounds.Width)x$($bounds.Height))"
                 let output = run_powershell_script(&cap_script).await?;
                 result_text = format!("{}\nFile: {}", output, shot_path.display());
 
-                if shot_path.exists() {
-                    if let Ok(bytes) = fs::read(&shot_path) {
-                        let b64 = base64::engine::general_purpose::STANDARD.encode(&bytes);
-                        contents.push(ContentBlock::image(b64, "image/png"));
-                    }
-                }
+                let bytes = fs::read(&shot_path).map_err(|e| {
+                    ErrorData::new(
+                        ErrorCode::INTERNAL_ERROR,
+                        format!("Failed to read captured screenshot: {e}"),
+                        None,
+                    )
+                })?;
+                let b64 = base64::engine::general_purpose::STANDARD.encode(&bytes);
+                contents.push(ContentBlock::image(b64, "image/png"));
                 capture_after = false;
             }
 
@@ -516,13 +519,16 @@ $bmp.Dispose()
 "#
             );
 
-            let _ = run_powershell_script(&cap_script).await;
-            if shot_path.exists() {
-                if let Ok(bytes) = fs::read(&shot_path) {
-                    let b64 = base64::engine::general_purpose::STANDARD.encode(&bytes);
-                    contents.push(ContentBlock::image(b64, "image/png"));
-                }
-            }
+            run_powershell_script(&cap_script).await?;
+            let bytes = fs::read(&shot_path).map_err(|e| {
+                ErrorData::new(
+                    ErrorCode::INTERNAL_ERROR,
+                    format!("Failed to read captured screenshot: {e}"),
+                    None,
+                )
+            })?;
+            let b64 = base64::engine::general_purpose::STANDARD.encode(&bytes);
+            contents.push(ContentBlock::image(b64, "image/png"));
         }
 
         contents.insert(
