@@ -28,16 +28,12 @@ const i18n = defineMessages({
 });
 
 interface ThemeSelectorProps {
-  className?: string;
-  hideTitle?: boolean;
-  horizontal?: boolean;
+  className: string;
+  hideTitle: boolean;
+  horizontal: boolean;
 }
 
-const ThemeSelector: React.FC<ThemeSelectorProps> = ({
-  className = '',
-  hideTitle = false,
-  horizontal = false,
-}) => {
+const ThemeSelector: React.FC<ThemeSelectorProps> = ({ className, hideTitle, horizontal }) => {
   const intl = useIntl();
   const { userThemePreference, setUserThemePreference } = useTheme();
 

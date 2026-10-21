@@ -229,8 +229,21 @@ export default function UpdateSection() {
     }
   };
 
-  const installUpdate = () => {
-    window.electron.installUpdate();
+  const installUpdate = async () => {
+    setUpdateStatus('installing');
+    try {
+      const result = await window.electron.installUpdate();
+      if (result.error) {
+        throw new Error(result.error);
+      }
+    } catch (error) {
+      setUpdateInfo((prev) => ({
+        ...prev,
+        error: errorMessage(error, 'Failed to install update'),
+      }));
+      setUpdateStatus('error');
+      setTimeout(() => setUpdateStatus('ready'), 5000);
+    }
   };
 
   const downloadUpdate = async () => {
@@ -264,6 +277,7 @@ export default function UpdateSection() {
       case 'downloading':
         return intl.formatMessage(i18n.downloadingProgress, { percent: Math.round(progress) });
       case 'ready':
+      case 'installing':
         return intl.formatMessage(i18n.downloadReady);
       case 'success':
         return updateInfo.isUpdateAvailable === false
@@ -283,6 +297,7 @@ export default function UpdateSection() {
     switch (updateStatus) {
       case 'checking':
       case 'downloading':
+      case 'installing':
         return <Loader2 className="w-4 h-4 animate-spin" />;
       case 'success':
         return <CheckCircle className="w-4 h-4 text-green-500" />;
@@ -338,8 +353,13 @@ export default function UpdateSection() {
               </Button>
             )}
 
-          {updateStatus === 'ready' && (
-            <Button onClick={installUpdate} variant="default" size="sm">
+          {(updateStatus === 'ready' || updateStatus === 'installing') && (
+            <Button
+              onClick={installUpdate}
+              disabled={updateStatus === 'installing'}
+              variant="default"
+              size="sm"
+            >
               {intl.formatMessage(i18n.installAndRestart)}
             </Button>
           )}

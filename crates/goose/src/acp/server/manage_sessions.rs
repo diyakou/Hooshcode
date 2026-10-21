@@ -24,16 +24,19 @@ impl GooseAcpAgent {
             })?;
 
         let agent = self.get_session_agent(session_id).await?;
-        agent
-            .update_extension_working_dir(&session.id, &path)
+        self.session_manager
+            .update(&session.id)
+            .working_dir(path)
+            .apply()
             .await
-            .internal_err_ctx("Failed to update extension working directory")?;
+            .internal_err_ctx("Failed to update working directory")?;
 
         let session = self
             .session_manager
             .get_session(session_id, false)
             .await
             .internal_err_ctx("Failed to reload session")?;
+        agent.config.providers.release(&session.id);
         agent
             .restore_provider_from_session(&session)
             .await

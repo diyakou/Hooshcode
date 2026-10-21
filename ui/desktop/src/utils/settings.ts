@@ -98,7 +98,6 @@ export const defaultSettings: Settings = {
   showPricing: true,
   seenAnnouncementIds: [],
   recentModels: [],
-  useLegacyAgentLoop: false,
 };
 
 export function getKeyboardShortcuts(settings: Settings): KeyboardShortcuts {

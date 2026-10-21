@@ -512,10 +512,9 @@ mod tests {
     fn client_for(manager: &Arc<ExtensionManager>) -> ExtensionManagerClient {
         ExtensionManagerClient::new(PlatformExtensionContext {
             extension_manager: None,
-            provider: manager.get_provider().clone(),
+            providers: manager.get_context().providers.clone(),
             session_manager: manager.get_context().session_manager.clone(),
             scheduler: None,
-            use_login_shell_path: false,
         })
         .unwrap()
     }
@@ -568,7 +567,7 @@ mod tests {
     #[tokio::test]
     async fn manage_extensions_emits_a_mutation_and_refuses_subagents() {
         let temp_dir = tempfile::tempdir().unwrap();
-        let manager = Arc::new(ExtensionManager::new_without_provider(
+        let manager = Arc::new(ExtensionManager::with_data_dir(
             temp_dir.path().to_path_buf(),
         ));
         let client = client_for(&manager);
@@ -592,7 +591,10 @@ mod tests {
             "the mutation is for the loop, not the model"
         );
         assert!(
-            !manager.is_extension_enabled("developer").await,
+            !manager
+                .is_extension_enabled(&user_id, "developer")
+                .await
+                .unwrap(),
             "the tool declares the change; the loop applies it"
         );
 
@@ -608,7 +610,7 @@ mod tests {
     #[tokio::test]
     async fn extension_manager_cannot_disable_itself() {
         let temp_dir = tempfile::tempdir().unwrap();
-        let manager = Arc::new(ExtensionManager::new_without_provider(
+        let manager = Arc::new(ExtensionManager::with_data_dir(
             temp_dir.path().to_path_buf(),
         ));
         let client = client_for(&manager);
@@ -635,7 +637,7 @@ mod tests {
     #[tokio::test]
     async fn subagent_and_unknown_callers_are_not_offered_extension_management() {
         let temp_dir = tempfile::tempdir().unwrap();
-        let manager = Arc::new(ExtensionManager::new_without_provider(
+        let manager = Arc::new(ExtensionManager::with_data_dir(
             temp_dir.path().to_path_buf(),
         ));
         let client = client_for(&manager);
@@ -668,6 +670,9 @@ mod tests {
 
         let unknown_enable = manage(&client, "missing-session", "enable").await;
         assert!(unknown_enable.is_error.unwrap_or(false));
-        assert!(!manager.is_extension_enabled("developer").await);
+        assert!(!manager
+            .is_extension_enabled(&subagent_id, "developer")
+            .await
+            .unwrap());
     }
 }

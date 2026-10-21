@@ -111,10 +111,10 @@ interface ClassifierEndpointInputsProps {
   disabled: boolean;
   endpointPlaceholder: string;
   tokenPlaceholder: string;
-  endpointLabel?: string;
-  endpointDescription?: string;
-  tokenLabel?: string;
-  tokenDescription?: string;
+  endpointLabel: string;
+  endpointDescription: string;
+  tokenLabel: string;
+  tokenDescription: string;
 }
 
 const ClassifierEndpointInputs = ({

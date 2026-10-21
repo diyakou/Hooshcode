@@ -129,14 +129,14 @@ interface CreateSubRecipeInlineProps {
   isOpen: boolean;
   onClose: () => void;
   onSubRecipeSaved: (subRecipe: SubRecipeFormData) => void;
-  existingSubRecipes?: SubRecipeFormData[];
+  existingSubRecipes: SubRecipeFormData[];
 }
 
 export default function CreateSubRecipeInline({
   isOpen,
   onClose,
   onSubRecipeSaved,
-  existingSubRecipes = [],
+  existingSubRecipes,
 }: CreateSubRecipeInlineProps) {
   const intl = useIntl();
   useEscapeKey(isOpen, onClose);

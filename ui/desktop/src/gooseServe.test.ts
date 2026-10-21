@@ -3,6 +3,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { buildLocalServeUrls, findGooseBinaryPath, startGooseServe } from './gooseServe';
+import { getLoginShellPath } from './loginShellPath';
 
 const binaryName = process.platform === 'win32' ? 'goose.exe' : 'goose';
 const tempDirs: string[] = [];
@@ -129,6 +130,61 @@ describe('startGooseServe', () => {
       }
     }
   });
+
+  it.skipIf(process.platform === 'win32')(
+    'gives goose the login PATH, then the inherited PATH, then the bundle',
+    async () => {
+      const tempDir = makeTempDir();
+      const loginDir = path.join(tempDir, 'login');
+      const inheritedDir = path.join(tempDir, 'inherited');
+      const bundleDir = path.join(tempDir, 'bundle');
+      const recordPath = path.join(tempDir, 'record.txt');
+      makeExecutable(path.join(loginDir, 'dup'), '#!/bin/sh\n');
+      makeExecutable(path.join(bundleDir, 'dup'), '#!/bin/sh\n');
+      makeExecutable(path.join(bundleDir, 'bundled-only'), '#!/bin/sh\n');
+      const loginShell = makeExecutable(
+        path.join(tempDir, 'login-shell'),
+        [
+          '#!/bin/sh',
+          '[ "$*" = "-l -i -c printenv PATH" ] || exit 1',
+          'echo "Welcome back!"',
+          `echo "${loginDir}:/usr/bin"`,
+          '',
+        ].join('\n')
+      );
+      const goosePath = makeExecutable(
+        path.join(bundleDir, 'goose'),
+        [
+          '#!/bin/sh',
+          '{ printf "%s\\n" "$PATH"; command -v dup; command -v bundled-only; } > "$TEST_RECORD_PATH.tmp"',
+          'mv "$TEST_RECORD_PATH.tmp" "$TEST_RECORD_PATH"',
+          'while true; do sleep 1; done',
+          '',
+        ].join('\n')
+      );
+      vi.stubEnv('GOOSE_BINARY', goosePath);
+      vi.stubEnv('SHELL', loginShell);
+      vi.stubEnv('PATH', `${inheritedDir}:/usr/bin:/bin`);
+
+      const result = await startGooseServe({
+        serverSecret: 'test-secret',
+        dir: tempDir,
+        env: { TEST_RECORD_PATH: recordPath },
+        loginShellPath: await getLoginShellPath(),
+        readinessFetch: async () => new Response(null, { status: 200 }),
+      });
+
+      try {
+        expect(await waitForFileLines(recordPath)).toEqual([
+          `${loginDir}:/usr/bin:${inheritedDir}:/usr/bin:/bin:${bundleDir}`,
+          path.join(loginDir, 'dup'),
+          path.join(bundleDir, 'bundled-only'),
+        ]);
+      } finally {
+        await result.cleanup();
+      }
+    }
+  );
 
   it.skipIf(process.platform === 'win32')('uses the injected readiness fetch', async () => {
     const tempDir = makeTempDir();

@@ -147,11 +147,10 @@ interface EditSessionModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSave: (sessionId: string, newDescription: string) => Promise<void>;
-  disabled?: boolean;
 }
 
 const EditSessionModal = React.memo<EditSessionModalProps>(
-  ({ session, isOpen, onClose, onSave, disabled = false }) => {
+  ({ session, isOpen, onClose, onSave }) => {
     const intl = useIntl();
     const [description, setDescription] = useState('');
     const [isUpdating, setIsUpdating] = useState(false);
@@ -166,7 +165,7 @@ const EditSessionModal = React.memo<EditSessionModalProps>(
     }, [session, isOpen]);
 
     const handleSave = useCallback(async () => {
-      if (!session || disabled) return;
+      if (!session) return;
 
       const trimmedDescription = description.trim();
       if (trimmedDescription === session.name) {
@@ -190,7 +189,7 @@ const EditSessionModal = React.memo<EditSessionModalProps>(
       } finally {
         setIsUpdating(false);
       }
-    }, [session, description, onSave, onClose, disabled, intl]);
+    }, [session, description, onSave, onClose, intl]);
 
     const handleCancel = useCallback(() => {
       if (!isUpdating) {
@@ -234,18 +233,18 @@ const EditSessionModal = React.memo<EditSessionModalProps>(
                 autoFocus
                 maxLength={200}
                 onKeyDown={handleKeyDown}
-                disabled={isUpdating || disabled}
+                disabled={isUpdating}
               />
             </div>
           </div>
 
           <div className="flex justify-end space-x-3 mt-6">
-            <Button onClick={handleCancel} variant="ghost" disabled={isUpdating || disabled}>
+            <Button onClick={handleCancel} variant="ghost" disabled={isUpdating}>
               {intl.formatMessage(i18n.cancel)}
             </Button>
             <Button
               onClick={handleSave}
-              disabled={!description.trim() || isUpdating || disabled}
+              disabled={!description.trim() || isUpdating}
               variant="default"
             >
               {isUpdating ? intl.formatMessage(i18n.saving) : intl.formatMessage(i18n.save)}
@@ -811,7 +810,7 @@ const SessionListView: React.FC<SessionListViewProps> = React.memo(({ onSelectSe
     );
   });
 
-  const SessionSkeleton = React.memo(({ variant = 0 }: { variant?: number }) => {
+  const SessionSkeleton = React.memo(({ variant }: { variant: number }) => {
     const titleWidths = ['w-3/4', 'w-2/3', 'w-4/5', 'w-1/2'];
     const pathWidths = ['w-32', 'w-28', 'w-36', 'w-24'];
     const tokenWidths = ['w-12', 'w-10', 'w-14', 'w-8'];
@@ -941,22 +940,22 @@ const SessionListView: React.FC<SessionListViewProps> = React.memo(({ onSelectSe
                       <div className="sticky top-0 z-10 bg-background-primary/95 backdrop-blur-sm">
                         <h2 className="text-text-secondary">{group.label}</h2>
                       </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4">
-                      {group.sessions.map((session) => (
-                        <SessionItem
-                          key={session.id}
-                          session={session}
-                          onEditClick={handleEditSession}
-                          onDuplicateClick={handleDuplicateSession}
-                          onDeleteClick={handleDeleteSession}
-                          onExportClick={handleExportSession}
-                          onOpenInNewWindow={handleOpenInNewWindow}
-                        />
-                      ))}
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4">
+                        {group.sessions.map((session) => (
+                          <SessionItem
+                            key={session.id}
+                            session={session}
+                            onEditClick={handleEditSession}
+                            onDuplicateClick={handleDuplicateSession}
+                            onDeleteClick={handleDeleteSession}
+                            onExportClick={handleExportSession}
+                            onOpenInNewWindow={handleOpenInNewWindow}
+                          />
+                        ))}
+                      </div>
                     </div>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
               )}
             </div>
           )}

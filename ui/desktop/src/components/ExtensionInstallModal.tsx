@@ -98,7 +98,7 @@ type ModalType = 'blocked' | 'untrusted' | 'trusted';
 
 interface ExtensionInfo {
   name: string;
-  command?: string;
+  command: string;
   remoteUrl?: string;
   link: string;
 }
@@ -121,7 +121,7 @@ interface ExtensionModalConfig {
 }
 
 interface ExtensionInstallModalProps {
-  addExtension?: (name: string, config: ExtensionConfig, enabled: boolean) => Promise<void>;
+  addExtension: (name: string, config: ExtensionConfig, enabled: boolean) => Promise<void>;
   setView: (view: View, options?: ViewOptions) => void;
 }
 
@@ -323,17 +323,13 @@ export function ExtensionInstallModal({ addExtension, setView }: ExtensionInstal
     setModalState((prev) => ({ ...prev, isPending: true }));
 
     try {
-      if (addExtension) {
-        await addExtensionFromDeepLink(
-          pendingLink,
-          addExtension,
-          (view: string, options?: ViewOptions) => {
-            setView(view as View, options);
-          }
-        );
-      } else {
-        throw new Error('addExtension function not provided to component');
-      }
+      await addExtensionFromDeepLink(
+        pendingLink,
+        addExtension,
+        (view: string, options?: ViewOptions) => {
+          setView(view as View, options);
+        }
+      );
       dismissModal();
     } catch (error) {
       setModalState((prev) => ({

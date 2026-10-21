@@ -8,6 +8,8 @@ pub mod chatrecall;
 pub mod code_execution;
 pub mod developer;
 pub mod ext_manager;
+#[cfg(feature = "code-mode")]
+mod javascript;
 #[cfg(feature = "scheduler")]
 pub mod scheduler;
 pub mod summarize;
@@ -162,11 +164,7 @@ pub static PLATFORM_EXTENSIONS: Lazy<HashMap<&'static str, PlatformExtensionDef>
                 hidden: false,
                 client_factory: |ctx| {
                     Some(Box::new(
-                        code_execution::CodeExecutionClient::new(
-                            ctx,
-                            code_execution::get_tool_disclosure(),
-                        )
-                        .unwrap(),
+                        code_execution::CodeExecutionClient::new(ctx).unwrap(),
                     ))
                 },
             },
@@ -181,7 +179,7 @@ pub static PLATFORM_EXTENSIONS: Lazy<HashMap<&'static str, PlatformExtensionDef>
                 default_enabled: true,
                 unprefixed_tools: true,
                 hidden: false,
-                client_factory: |ctx| Some(Box::new(developer::DeveloperClient::new(ctx).unwrap())),
+                client_factory: |_| Some(Box::new(developer::DeveloperClient::new().unwrap())),
             },
         );
 
@@ -223,13 +221,27 @@ pub struct PlatformExtensionContext {
     /// below.
     pub extension_manager:
         Option<std::sync::Weak<crate::agents::extension_manager::ExtensionManager>>,
-    pub provider: crate::agents::types::SharedProvider,
+    pub providers: std::sync::Arc<crate::agents::provider_manager::ProviderManager>,
     pub session_manager: std::sync::Arc<crate::session::SessionManager>,
     pub scheduler: Option<std::sync::Arc<dyn crate::scheduler_trait::SchedulerTrait>>,
-    pub use_login_shell_path: bool,
 }
 
 impl PlatformExtensionContext {
+    pub async fn provider_for_session(
+        &self,
+        session_id: &str,
+    ) -> Result<std::sync::Arc<dyn crate::providers::base::Provider>, String> {
+        let session = self
+            .session_manager
+            .get_session(session_id, false)
+            .await
+            .map_err(|e| e.to_string())?;
+        self.providers
+            .provider_for(&session)
+            .await
+            .map_err(|e| e.to_string())
+    }
+
     pub async fn model_config_for_session(
         &self,
         session_id: &str,
