@@ -7,6 +7,46 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.0-alpha.13](https://github.com/diyakou/Hooshcode/compare/gdk-v0.1.0-alpha.12...gdk-v0.1.0-alpha.13) - 2026-10-31
+
+### Added
+
+- *(subagent)* resume failed or cancelled delegates ([#13015](https://github.com/diyakou/Hooshcode/pull/13015))
+- surface provider x-request-id on responses and errors ([#12587](https://github.com/diyakou/Hooshcode/pull/12587))
+- *(goose-agent)* add tool calling ([#11627](https://github.com/diyakou/Hooshcode/pull/11627))
+
+### Fixed
+
+- *(compaction)* context freeze preserved message must stay user-visible ([#12692](https://github.com/diyakou/Hooshcode/pull/12692))
+- *(agents)* keep streamed thinking ahead of text and tool calls ([#11837](https://github.com/diyakou/Hooshcode/pull/11837))
+- *(anthropic)* preserved-thinking compliance for the provider layer ([#11836](https://github.com/diyakou/Hooshcode/pull/11836))
+
+### Other
+
+- Automatic Thinking Level Operation ([#12237](https://github.com/diyakou/Hooshcode/pull/12237))
+- Limit concurrent subagents with GOOSE_MAX_CONCURRENT_SUBAGENTS ([#12946](https://github.com/diyakou/Hooshcode/pull/12946))
+- move skills discovery into GDK ([#12935](https://github.com/diyakou/Hooshcode/pull/12935))
+- run foreground subagents in the GDK ([#12792](https://github.com/diyakou/Hooshcode/pull/12792))
+- agent loop: make tool operations own tool call checks ([#12865](https://github.com/diyakou/Hooshcode/pull/12865))
+- *(GDK)* release v0.1.0-alpha.12 ([#12561](https://github.com/diyakou/Hooshcode/pull/12561))
+- not infer or steer while a tool approval is pending ([#12808](https://github.com/diyakou/Hooshcode/pull/12808))
+- changed yield_to_customer to next enum ([#12789](https://github.com/diyakou/Hooshcode/pull/12789))
+- rename to finalize_cancellation and make Emitter sync ([#12786](https://github.com/diyakou/Hooshcode/pull/12786))
+- agent loop: make Stop end the run promptly and save what it produced ([#12765](https://github.com/diyakou/Hooshcode/pull/12765))
+- Delete the legacy agent loop ([#12760](https://github.com/diyakou/Hooshcode/pull/12760))
+- Resolve extensions into a per-inference lease ([#12161](https://github.com/diyakou/Hooshcode/pull/12161))
+- Run the GDK agent loop on wasm32 ([#12569](https://github.com/diyakou/Hooshcode/pull/12569))
+- *(GDK)* release v0.1.0-alpha.11 ([#12495](https://github.com/diyakou/Hooshcode/pull/12495))
+- don't emit warning when ending on a successful tool call ([#12468](https://github.com/diyakou/Hooshcode/pull/12468))
+- *(GDK)* release v0.1.0-alpha.10 ([#12492](https://github.com/diyakou/Hooshcode/pull/12492))
+- *(GDK)* release v0.1.0-alpha.9 ([#11866](https://github.com/diyakou/Hooshcode/pull/11866))
+- goose-sdk version bump alpha 8 ([#11815](https://github.com/diyakou/Hooshcode/pull/11815))
+- publish GDK packages from version tags ([#11595](https://github.com/diyakou/Hooshcode/pull/11595))
+- Clean up obsolete extension paths before redesigning the extension manager ([#11645](https://github.com/diyakou/Hooshcode/pull/11645))
+- move inference operation into goose-agent ([#11294](https://github.com/diyakou/Hooshcode/pull/11294))
+- add SDK API reference for Rust, Python, and Kotlin ([#11251](https://github.com/diyakou/Hooshcode/pull/11251))
+- create the goose-agent crate with the unrolled agent loop state machine ([#11216](https://github.com/diyakou/Hooshcode/pull/11216))
+
 ## [0.1.0-alpha.12](https://github.com/aaif-goose/goose/compare/gdk-v0.1.0-alpha.11...gdk-v0.1.0-alpha.12) - 2026-10-13
 
 ### Added
