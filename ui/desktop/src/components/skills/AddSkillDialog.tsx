@@ -2,9 +2,9 @@ import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '../ui/dialog';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
-import { FolderOpen, Plus, FileText, Upload } from 'lucide-react';
-import { createSkillSource } from '../../acp/sources';
+import { FolderOpen, Plus } from 'lucide-react';
 import { toast } from 'react-toastify';
+const installSkill = (source: string) => window.electron.installSkill(source);
 
 interface AddSkillDialogProps {
   open: boolean;
@@ -13,9 +13,7 @@ interface AddSkillDialogProps {
 }
 
 export function AddSkillDialog({ open, onOpenChange, onSkillAdded }: AddSkillDialogProps) {
-  const [name, setName] = useState('');
-  const [description, setDescription] = useState('');
-  const [content, setContent] = useState('');
+  const [source, setSource] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleOpenSkillsFolder = async () => {
@@ -34,54 +32,22 @@ export function AddSkillDialog({ open, onOpenChange, onSkillAdded }: AddSkillDia
     }
   };
 
-  const handleImportFile = async () => {
-    try {
-      const selected = await window.electron.selectFileOrDirectory();
-      if (!selected) return;
-
-      const fileRes = await window.electron.selectImportSessionFile();
-      if (fileRes && fileRes.contents) {
-        setContent(fileRes.contents);
-        if (!name && fileRes.filePath) {
-          const baseName = fileRes.filePath.split(/[\\/]/).pop()?.replace(/\.md$/i, '') || '';
-          setName(baseName.toLowerCase().replace(/[^a-z0-9-]/g, '-'));
-        }
-      }
-    } catch (err) {
-      toast.error(`Import Failed: ${String(err)}`);
-    }
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const cleanName = name
-      .trim()
-      .toLowerCase()
-      .replace(/[^a-z0-9-]/g, '-');
-    if (!cleanName) {
-      toast.error('Please provide a valid skill name (letters, numbers, hyphens)');
+    const skillSource = source.trim();
+    if (!skillSource) {
+      toast.error('Enter a skills repository or source');
       return;
     }
-    if (!description.trim()) {
-      toast.error('Please provide a description for the skill');
-      return;
-    }
-    if (!content.trim()) {
-      toast.error('Please provide skill instructions (Markdown content)');
-      return;
-    }
-
     try {
       setIsSubmitting(true);
-      await createSkillSource(cleanName, description.trim(), content.trim());
-      toast.success(`Skill "${cleanName}" created successfully!`);
-      setName('');
-      setDescription('');
-      setContent('');
+      await installSkill(skillSource);
+      toast.success('Skill installed. Refreshing available skills…');
+      setSource('');
       onOpenChange(false);
       onSkillAdded();
     } catch (err) {
-      toast.error(`Failed to create skill: ${String(err)}`);
+      toast.error(`Skill installation failed: ${String(err)}`);
     } finally {
       setIsSubmitting(false);
     }
@@ -94,92 +60,53 @@ export function AddSkillDialog({ open, onOpenChange, onSkillAdded }: AddSkillDia
           <div className="flex items-center justify-between">
             <DialogTitle className="flex items-center gap-2 text-xl font-medium">
               <Plus className="w-5 h-5 text-text-primary" />
-              Add Custom Skill (افزودن مهارت جدید)
+              Install a Skill (نصب مهارت)
             </DialogTitle>
           </div>
           <p className="text-xs text-text-secondary mt-1">
-            Create a custom skill or open your local skills folder to drop in pre-made skills.
+            Install skills from a repository using the skills CLI. Goose discovers installed SKILL.md files automatically.
+            Node.js and npm/npx must be available on your PATH.
           </p>
         </DialogHeader>
 
-        <div className="flex gap-2 my-3 p-2 bg-background-secondary rounded-lg border border-border-primary">
+        <div className="my-3 p-2 bg-background-secondary rounded-lg border border-border-primary">
           <Button
             type="button"
             variant="secondary"
             size="sm"
-            className="flex-1 flex items-center gap-2"
+            className="w-full flex items-center gap-2"
             onClick={handleOpenSkillsFolder}
           >
             <FolderOpen className="w-4 h-4" />
             Open Skills Folder (پوشه مهارت‌ها)
-          </Button>
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            className="flex-1 flex items-center gap-2"
-            onClick={handleImportFile}
-          >
-            <Upload className="w-4 h-4" />
-            Import SKILL.md (بارگذاری فایل)
           </Button>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="text-xs font-medium text-text-primary mb-1 block">
-              Skill Name (نام مهارت - حروف کوچک و خط تیره)
+              GitHub repository or npx command
             </label>
             <Input
-              value={name}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                setName(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, '-'))
-              }
-              placeholder="e.g. photoshop-helper or video-editor"
+              value={source}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSource(e.target.value)}
+              placeholder="e.g. npx skills add Barty-Bart/motion-graphics"
+              disabled={isSubmitting}
               required
               className="font-mono text-sm"
             />
           </div>
-
-          <div>
-            <label className="text-xs font-medium text-text-primary mb-1 block">
-              Description (توضیحات مهارت)
-            </label>
-            <Input
-              value={description}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setDescription(e.target.value)}
-              placeholder="What this skill helps with (e.g. Automates Adobe Photoshop photo edits)"
-              required
-              className="text-sm"
-            />
-          </div>
-
-          <div>
-            <label className="text-xs font-medium text-text-primary mb-1 block">
-              Instructions & Guidelines (دستورالعمل‌ها و پرامپت مهارت - Markdown)
-            </label>
-            <textarea
-              value={content}
-              onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setContent(e.target.value)}
-              placeholder={`# Skill Instructions\n\nWhen asked to edit photos or videos:\n1. Use computer_control to capture the screen\n2. Locate the tool or send hotkeys\n...`}
-              rows={8}
-              required
-              className="w-full rounded-md border border-border-primary bg-background-primary px-3 py-2 text-xs font-mono text-text-primary focus:outline-none focus:ring-1 focus:ring-primary"
-            />
-          </div>
-
+          <p className="text-xs text-text-secondary">
+            Installs all skills from the repository to <code>~/.agents/skills</code> using npx,
+            without terminal prompts. You can paste a GitHub URL, owner/repo, or npx skills add command.
+          </p>
           <DialogFooter className="pt-2 flex justify-end gap-2">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => onOpenChange(false)}
-              disabled={isSubmitting}
-            >
+            <Button type="button" variant="outline" onClick={() => onOpenChange(false)} disabled={isSubmitting}>
               Cancel
             </Button>
             <Button type="submit" disabled={isSubmitting} className="flex items-center gap-2">
-              <FileText className="w-4 h-4" />
-              {isSubmitting ? 'Creating...' : 'Create Skill (ذخیره مهارت)'}
+              <Plus className="w-4 h-4" />
+              {isSubmitting ? 'Installing...' : 'Install Skill'}
             </Button>
           </DialogFooter>
         </form>

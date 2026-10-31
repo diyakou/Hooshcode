@@ -35,6 +35,7 @@ import { GooseServeLeaseRegistry, type GooseServeLease } from './gooseServeLease
 import { normalizeAcpHttpBaseUrl } from './acp/url';
 import { expandTilde, sanitizeGoosePathRoot } from './utils/pathUtils';
 import log from './utils/logger';
+import './utils/skillInstaller';
 import { ensureWinShims } from './utils/winShims';
 import { installWindowsCli } from './utils/windowsCliInstall';
 import { addRecentDir, loadRecentDirs } from './utils/recentDirs';

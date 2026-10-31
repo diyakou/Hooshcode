@@ -117,6 +117,7 @@ type ElectronAPI = {
     contents: string;
     error?: string;
   } | null>;
+  installSkill: (source: string) => Promise<void>;
   getBinaryPath: (binaryName: string) => Promise<string>;
   selectRecipeFile: () => Promise<FileResponse | null>;
   readGoosehints: () => Promise<FileResponse>;
@@ -217,6 +218,7 @@ const electronAPI: ElectronAPI = {
   selectFileOrDirectory: (defaultPath?: string) =>
     ipcRenderer.invoke('select-file-or-directory', defaultPath),
   selectImportSessionFile: () => ipcRenderer.invoke('select-import-session-file'),
+  installSkill: (source: string) => ipcRenderer.invoke('skills-install', source),
   getBinaryPath: (binaryName: string) => ipcRenderer.invoke('get-binary-path', binaryName),
   selectRecipeFile: () => ipcRenderer.invoke('select-recipe-file'),
   readGoosehints: () => ipcRenderer.invoke('read-goosehints'),
